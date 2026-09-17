@@ -18,6 +18,7 @@ import generate from '../../common/uid'
 import runIdle from '../../common/run-idle'
 import getInitItem from '../../common/init-setting-item'
 import testCon from '../../common/test-connection'
+import getProxy from '../../common/get-proxy'
 import newTerm from '../../common/new-terminal'
 import { isValidIP } from '../../common/is-ip'
 import { action as manateAction } from 'manate'
@@ -162,7 +163,18 @@ export default function FormRenderer ({ config, props }) {
       delete obj.terminalBackground
     }
     if (isTest) {
-      return test(obj)
+      // Mirror the real-session option resolution (see terminal/mixins/
+      // term-socket.js): global proxy and sshReadyTimeout must apply to the
+      // test too, otherwise a "test passed" says nothing about the actual
+      // connection (e.g. global proxy enabled but unable to reach the host
+      // produces test-ok / real-session "Timed out while waiting for
+      // handshake").
+      const conf = props.store?.config || window.store.config || {}
+      return testCon({
+        ...obj,
+        readyTimeout: obj.readyTimeout || conf.sshReadyTimeout,
+        proxy: getProxy(obj, conf)
+      })
     }
     if (evt && evt !== 'connect') {
       submit(evt, obj)
