@@ -14,6 +14,7 @@
     "prepare-file": "node build/bin/prepare",
     "pb": "node build/bin/prepare-electron-build.js",
     "build-win": "node build/bin/build-win-nsis.js",
+    "icon": "node build/bin/gen-icon.js",
     "postinstall": "node build/bin/post-install",
     "lint": "./node_modules/.bin/standard --verbose",
     "fix": "./node_modules/.bin/standard --fix",
@@ -36,9 +37,7 @@
     "url": "git+https://github.com/electerm/electerm.git"
   },
   "author": {
-    "name": "ZHAO Xudong",
-    "email": "zxdong@gmail.com",
-    "url": "https://github.com/zxdong262"
+    "name": "产品市场部"
   },
   "bugs": {
     "url": "https://github.com/electerm/electerm/issues"
@@ -83,6 +82,7 @@
     "manate": "2.0.3",
     "morgan": "1.11.0",
     "multer": "^2.2.0",
+    "png-to-ico": "^3.0.2",
     "pug": "3.0.4",
     "react": "19.2.7",
     "react-diff-viewer-continued": "4.4.0",

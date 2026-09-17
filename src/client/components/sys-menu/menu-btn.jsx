@@ -6,7 +6,6 @@ import { PureComponent } from 'react'
 import {
   Popover
 } from 'antd'
-import logoSvg from '@electerm/electerm-resource/res/imgs/electerm.svg?raw'
 import { shortcutDescExtend } from '../shortcuts/shortcut-handler.js'
 import MenuRender from './sys-menu.jsx'
 import { refsStatic } from '../common/ref.js'
@@ -217,10 +216,7 @@ class MenuBtn extends PureComponent {
         <div
           {...pops}
         >
-          <span
-            className='menu-logo'
-            dangerouslySetInnerHTML={{ __html: logoSvg }}
-          />
+          <span className='menu-logo-text'>VIS</span>
         </div>
       </Popover>
     )

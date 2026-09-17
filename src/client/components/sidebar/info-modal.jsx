@@ -33,50 +33,6 @@ export default auto(function InfoModal (props) {
     }
   }
 
-  const renderParsed = (obj, depth = 0) => {
-    if (Array.isArray(obj)) {
-      return (
-        <ul className='pd2l'>
-          {obj.map((item, i) => (
-            <li key={i}>{renderParsed(item, depth + 1)}</li>
-          ))}
-        </ul>
-      )
-    } else if (typeof obj === 'object' && obj !== null) {
-      return (
-        <div className={depth > 0 ? 'pd2l' : ''}>
-          {Object.entries(obj).map(([k, v]) => (
-            <div key={k} className='pd1b'>
-              <b>{k}:</b> {renderParsed(v, depth + 1)}
-            </div>
-          ))}
-        </div>
-      )
-    } else {
-      return <span>{String(obj)}</span>
-    }
-  }
-
-  const renderValue = (v) => {
-    try {
-      const parsed = JSON.parse(v)
-      return renderParsed(parsed)
-    } catch {
-      return <span>{v}</span>
-    }
-  }
-
-  const renderOSInfo = () => {
-    return window.pre.osInfo().map(({ k, v }, i) => (
-      <div className='pd1b' key={i + '_os_' + k}>
-        <b className='bold'>{k}:</b>
-        <span className='mg1l'>
-          {renderValue(v)}
-        </span>
-      </div>
-    ))
-  }
-
   const { infoModalTab, commandLineHelp } = props
   const {
     showInfoModal
@@ -140,7 +96,7 @@ export default auto(function InfoModal (props) {
           </p>
           <p className='mg1b'>
             <UserOutlined /> <b className='mg1r'>{e('author')} ➾</b>
-            <span className='mg1l'>{authorName} ({email})</span>
+            <span className='mg1l'>{authorName}{email ? ` (${email})` : ''}</span>
           </p>
           <p className='mg1b'>
             <InfoCircleOutlined /> <b className='mg1r'>{window.store.installSrc}</b>
@@ -178,11 +134,6 @@ export default auto(function InfoModal (props) {
           </div>
         )
       })
-    },
-    {
-      key: infoTabs.os,
-      label: e('os'),
-      children: <div>{renderOSInfo()}</div>
     }
   ]
 
