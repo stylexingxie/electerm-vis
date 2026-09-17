@@ -1104,7 +1104,24 @@ class TerminalSshBase extends TerminalBase {
   }
 
   init () {
-    return this.remoteInitProcess()
+    return this.remoteInitProcess().catch(err => {
+      // surface the actual connection context on timeout errors so the
+      // user can tell whether a proxy was injected and which host/port
+      // was really used
+      if (
+        err.message.includes('Timed out while waiting for handshake') ||
+        err.message.includes('keepalive')
+      ) {
+        const { initOptions } = this
+        const ctx = [
+          `host=${initOptions.host}:${initOptions.port}`,
+          `proxy=${initOptions.proxy || 'none'}`,
+          `readyTimeout=${initOptions.readyTimeout || 'default(20s)'}`
+        ].join(', ')
+        err.message = `${err.message} (${ctx})`
+      }
+      throw err
+    })
   }
 }
 
@@ -1124,6 +1141,8 @@ exports.test = (options, ws) => {
     .then(() => true)
     .catch((err) => {
       log.error('test ssh error', err)
-      return false
+      // re-throw so the UI shows the real failure reason instead of a
+      // generic "test failed"
+      throw err
     })
 }
