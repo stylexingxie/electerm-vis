@@ -124,6 +124,15 @@ export default function FormRenderer ({ config, props }) {
     let msg = ''
     setTesting(true)
     options = window.store.applyProfileToTabs(options)
+    // Mirror the real-session option resolution (see terminal/mixins/
+    // term-socket.js): global proxy and sshReadyTimeout must apply to the
+    // test too, otherwise a "test passed" says nothing about the actual
+    // connection (e.g. global proxy enabled but unable to reach the host
+    // produces test-ok / real-session "Timed out while waiting for
+    // handshake").
+    const conf = window.store.config || {}
+    options.readyTimeout = options.readyTimeout || conf.sshReadyTimeout
+    options.proxy = getProxy(options, conf)
     const res = await testCon(options)
       .then(r => r)
       .catch((e) => {
@@ -163,18 +172,7 @@ export default function FormRenderer ({ config, props }) {
       delete obj.terminalBackground
     }
     if (isTest) {
-      // Mirror the real-session option resolution (see terminal/mixins/
-      // term-socket.js): global proxy and sshReadyTimeout must apply to the
-      // test too, otherwise a "test passed" says nothing about the actual
-      // connection (e.g. global proxy enabled but unable to reach the host
-      // produces test-ok / real-session "Timed out while waiting for
-      // handshake").
-      const conf = props.store?.config || window.store.config || {}
-      return testCon({
-        ...obj,
-        readyTimeout: obj.readyTimeout || conf.sshReadyTimeout,
-        proxy: getProxy(obj, conf)
-      })
+      return test(obj)
     }
     if (evt && evt !== 'connect') {
       submit(evt, obj)
