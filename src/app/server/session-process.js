@@ -258,13 +258,19 @@ exports.testConnection = async function (initOptions, ws, uid) {
     })
   }
 
-  const res = await sendMsgToChildProcess(child, {
-    id: uid,
-    action: 'test-terminal',
-    body: initOptions
-  }, 60000)
-
-  child.kill()
+  let res
+  try {
+    res = await sendMsgToChildProcess(child, {
+      id: uid,
+      action: 'test-terminal',
+      body: initOptions
+    }, 60000)
+  } finally {
+    // always release the child, even when the test request fails or times
+    // out — otherwise a failed test leaks a session-server process (bounded
+    // only by its own 2min no-connection self-terminate)
+    child.kill()
+  }
   return res
 }
 

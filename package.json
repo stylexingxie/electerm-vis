@@ -31,19 +31,9 @@
     "lock": "pnpm install --lockfile-only"
   },
   "license": "MIT",
-  "languageRepo": "https://github.com/electerm/electerm-locales",
-  "repository": {
-    "type": "git",
-    "url": "git+https://github.com/electerm/electerm.git"
-  },
   "author": {
     "name": "产品市场部"
   },
-  "bugs": {
-    "url": "https://github.com/electerm/electerm/issues"
-  },
-  "homepage": "https://electerm.org",
-  "releases": "https://github.com/electerm/electerm/releases",
   "engines": {
     "node": ">=16.0.0"
   },

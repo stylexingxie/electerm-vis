@@ -52,7 +52,7 @@ function findLang (langs, la) {
   return res
 }
 
-const getLang = (config, sysLocale, langs) => {
+const getLang = (config, langs) => {
   if (config.language) {
     return config.language
   }

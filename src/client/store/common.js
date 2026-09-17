@@ -63,7 +63,7 @@ export default Store => {
     const isMaximized = window.pre.runSync('isMaximized')
     const w = window.innerWidth
     const isMobile = w <= mobileBreakpoint
-    const update = {
+    const sizeInfo = {
       height: window.innerHeight,
       innerWidth: w,
       screenWidth: width,
@@ -71,13 +71,13 @@ export default Store => {
       isMaximized,
       isMobile
     }
-    window.store.storeAssign(update)
+    window.store.storeAssign(sizeInfo)
     // Force single-column layout on mobile
     if (isMobile && window.store.layout !== splitMap.c1) {
       window.store.setLayout(splitMap.c1)
     }
     window.pre.runGlobalAsync('setWindowSize', {
-      ...update,
+      ...sizeInfo,
       height: window.outerHeight
     })
   }, 100, {

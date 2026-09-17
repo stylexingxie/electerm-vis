@@ -1,4 +1,3 @@
-// import { buildDefaultThemes } from '../../common/terminal-theme'
 import ThemeEditSlot from './theme-edit-slot'
 
 export default function ThemeEditor (props) {

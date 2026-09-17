@@ -1,7 +1,11 @@
 Add-Type -AssemblyName System.Drawing
-$root = 'c:/Users/ZhuanZ/Documents/trae_projects/electerm_ori/electerm-5.5.6/electerm-5.5.6'
+$root = (Resolve-Path (Join-Path $PSScriptRoot '..\..')).Path
 $src = Join-Path $root 'iconrp.png'
-$brand = Join-Path $root 'src/client/assets/brand'
+$brand = Join-Path $root 'src\client\assets\brand'
+
+if (-not (Test-Path $src)) {
+    throw "icon source not found: $src"
+}
 
 $img = [System.Drawing.Image]::FromFile($src)
 

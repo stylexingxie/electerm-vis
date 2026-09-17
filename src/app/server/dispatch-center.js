@@ -28,7 +28,11 @@ function verify (req) {
   if (to !== tokenElecterm) {
     throw new Error('not valid request')
   }
-  if (process.env.requireAuth === 'yes' && !globalState.authed) {
+  // process.env.requireAuth holds the hashed login password (see
+  // lib/child-process.js): when a password is configured, WS channels
+  // additionally require the /auth-verified state. An empty value means
+  // no password is configured and the token check above is enough.
+  if (process.env.requireAuth && !globalState.authed) {
     throw new Error('auth required')
   }
 }

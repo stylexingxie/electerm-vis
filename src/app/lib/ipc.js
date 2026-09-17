@@ -113,7 +113,7 @@ async function initAppServer () {
     langMap,
     sysLocale
   } = await loadLocales()
-  const language = getLang(config, sysLocale, langs)
+  const language = getLang(config, langs)
   config.language = language
   globalState.set('langMap', langMap)
   if (!globalState.get('serverInited')) {
