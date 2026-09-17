@@ -31,6 +31,12 @@ execSync(
   { stdio: 'inherit', cwd: root }
 )
 
+console.log('generate brand logo & watermark...')
+execSync(
+  `powershell.exe -NoProfile -ExecutionPolicy Bypass -File "${resolve(__dirname, 'make-brand.ps1')}"`,
+  { stdio: 'inherit', cwd: root }
+)
+
 async function main () {
   const pngToIco = (await import('png-to-ico')).default
   const sizes = [256, 128, 64, 48, 32, 16]
