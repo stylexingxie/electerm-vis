@@ -131,7 +131,10 @@ export default function FormRenderer ({ config, props }) {
     // produces test-ok / real-session "Timed out while waiting for
     // handshake").
     const conf = window.store.config || {}
-    options.readyTimeout = options.readyTimeout || conf.sshReadyTimeout
+    // same 5s floor as term-socket.js: a too-small sshReadyTimeout makes
+    // every connection fail with a handshake timeout
+    options.readyTimeout = options.readyTimeout ||
+      Math.max(Number(conf.sshReadyTimeout) || 50000, 5000)
     options.proxy = getProxy(options, conf)
     const res = await testCon(options)
       .then(r => r)
