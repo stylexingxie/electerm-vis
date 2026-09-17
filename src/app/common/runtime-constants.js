@@ -57,7 +57,7 @@ module.exports = {
   dataFolderName,
   minWindowWidth: 590,
   minWindowHeight: 400,
-  defaultLang: 'en_us',
+  defaultLang: 'zh_cn',
   tempDir: require('os').tmpdir(),
   homeOrTmp: os.homedir() || os.tmpdir(),
   packInfo

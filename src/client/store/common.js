@@ -262,7 +262,7 @@ export default Store => {
   }
 
   Store.prototype.getLangName = function (
-    lang = window.store?.config.language || 'en_us'
+    lang = window.store?.config.language || 'zh_cn'
   ) {
     return get(window.langMap, `[${lang}].name`)
   }

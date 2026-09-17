@@ -56,9 +56,10 @@ const getLang = (config, sysLocale, langs) => {
   if (config.language) {
     return config.language
   }
-  let l = sysLocale
-  l = l ? l.toLowerCase().replace('-', '_') : defaultLang
-  return findLang(langs, l) || defaultLang
+  // internal build: Simplified Chinese is the default UI language,
+  // regardless of the OS locale (config.language, set in the settings
+  // panel, always wins)
+  return findLang(langs, 'zh_cn') || defaultLang
 }
 
 exports.getLang = getLang

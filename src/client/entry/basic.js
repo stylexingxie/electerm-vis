@@ -49,7 +49,7 @@ async function load () {
   const initLocale = window.pre.runSync('getInitLocale') || {}
   window.langMap = initLocale.langMap
   window.initLanguage = initLocale.language
-  window.getLang = (lang = window.store?.config.language || window.initLanguage || 'en_us') => {
+  window.getLang = (lang = window.store?.config.language || window.initLanguage || 'zh_cn') => {
     return _get(window.langMap, `[${lang}].lang`)
   }
   window.translate = txt => {

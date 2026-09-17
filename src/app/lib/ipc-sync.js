@@ -104,7 +104,7 @@ module.exports = {
     const config = globalState.get('config')
     const langMap = globalState.get('langMap')
     return {
-      language: config?.language || 'en_us',
+      language: config?.language || 'zh_cn',
       langMap: langMap || {}
     }
   },
