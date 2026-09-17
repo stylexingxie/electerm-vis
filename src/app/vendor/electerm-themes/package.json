@@ -1,0 +1,12 @@
+{
+  "name": "@electerm/electerm-themes",
+  "version": "1.0.1",
+  "private": true,
+  "description": "Vendored copy of @electerm/electerm-themes (MIT), iTerm2 colour schemes. Upstream: https://github.com/electerm/electerm-themes",
+  "main": "dist/index.js",
+  "author": {
+    "name": "ZHAO Xudong",
+    "email": "zxdong@gmail.com"
+  },
+  "license": "MIT"
+}

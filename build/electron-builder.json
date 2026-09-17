@@ -1,0 +1,32 @@
+{
+  "appId": "com.visystem.vis-remote-tool",
+  "productName": "vis远程工具",
+  "directories": {
+    "app": "work/app",
+    "output": "dist",
+    "buildResources": "build-res"
+  },
+  "electronLanguages": [
+    "en-US"
+  ],
+  "asar": true,
+  "npmRebuild": false,
+  "publish": null,
+  "asarUnpack": [
+    "node_modules/node-pty/prebuilds/**",
+    "node_modules/node-pty/build/Release/**",
+    "node_modules/@serialport/bindings-cpp/prebuilds/**"
+  ],
+  "artifactName": "${productName}-${version}-${os}-${arch}.${ext}",
+  "win": {
+    "target": [
+      "nsis"
+    ],
+    "icon": "build-res/icon.ico"
+  },
+  "nsis": {
+    "oneClick": false,
+    "artifactName": "${productName}-${version}-${os}-${arch}-installer.${ext}",
+    "allowToChangeInstallationDirectory": true
+  }
+}

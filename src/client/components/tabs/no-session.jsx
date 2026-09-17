@@ -1,0 +1,48 @@
+import { Button } from 'antd'
+import LogoElem from '../common/logo-elem.jsx'
+import HistoryPanel from '../sidebar/history'
+import QuickConnect from './quick-connect'
+import './no-session.styl'
+
+const e = window.translate
+
+export default function NoSessionPanel ({ height, onNewTab, onNewSsh, batch }) {
+  const props = {
+    style: {
+      height: height + 'px'
+    }
+  }
+  const handleClick = () => {
+    window.openTabBatch = batch
+  }
+
+  const newTabDom = window.store.hasNodePty
+    ? (
+      <Button
+        onClick={onNewTab}
+        className='add-new-tab-btn'
+      >
+        {e('newTab')}
+      </Button>
+      )
+    : null
+  return (
+    <div className='no-sessions vis-logo-bg' {...props}>
+      <div className='no-session-btns'>
+        {newTabDom}
+        <Button
+          onClick={onNewSsh}
+        >
+          {e('newBookmark')}
+        </Button>
+        <QuickConnect batch={batch} />
+      </div>
+      <div className='no-session-logo'>
+        <LogoElem />
+      </div>
+      <div className='no-session-history' onClick={handleClick}>
+        <HistoryPanel sort />
+      </div>
+    </div>
+  )
+}
