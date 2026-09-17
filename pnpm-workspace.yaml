@@ -1,5 +1,5 @@
-onlyBuiltDependencies:
-  - '@serialport/bindings-cpp'
-  - electron
-  - electron-winstaller
-  - node-pty
+allowBuilds:
+  '@serialport/bindings-cpp': true
+  electron: true
+  electron-winstaller: true
+  node-pty: true

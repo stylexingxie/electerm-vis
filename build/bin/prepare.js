@@ -57,6 +57,24 @@ require('fs').writeFileSync(
   'node-linker=hoisted\n'
 )
 
+// Without this file pnpm walks up and adopts the repository root as its
+// workspace: it reuses the root lockfile and runs the root project's
+// lifecycle scripts (whose devDependencies are absent under --prod).
+// A local pnpm-workspace.yaml makes work/app its own standalone root.
+// It also carries allowBuilds so native-module install scripts (node-pty,
+// @serialport/bindings-cpp) are allowed to run inside the packaged tree.
+require('fs').writeFileSync(
+  resolve(__dirname, '../../work/app/pnpm-workspace.yaml'),
+  [
+    "allowBuilds:",
+    "  '@serialport/bindings-cpp': true",
+    '  electron: true',
+    '  electron-winstaller: true',
+    '  node-pty: true',
+    ''
+  ].join('\n')
+)
+
 // Install production dependencies only.
 //
 // The package manager is taken from `npm_execpath`, which the invoking package
@@ -64,14 +82,22 @@ require('fs').writeFileSync(
 // the current node binary. This avoids depending on the manager being
 // resolvable on the child process PATH — a nested bare `pnpm` call fails
 // whenever the manager is not installed globally.
+// A standalone pnpm install exposes npm_execpath as a self-contained
+// `pnpm.exe`, which node cannot execute — run it directly in that case.
+// Otherwise npm_execpath is a JS entry (pnpm.cjs / npm-cli.js / yarn.js)
+// and must be run through the current node binary.
+const isExecutablePath = /\.exe$/i.test(process.env.npm_execpath || '')
 const packageManager = process.env.npm_execpath
-  ? `"${process.execPath}" "${process.env.npm_execpath}"`
+  ? (isExecutablePath
+      ? `"${process.env.npm_execpath}"`
+      : `"${process.execPath}" "${process.env.npm_execpath}"`)
   : 'pnpm'
 exec(`${packageManager} install --prod`, {
   cwd: resolve(__dirname, '../../work/app')
 })
-// the packaged app does not need the packaging-only .npmrc
+// the packaged app does not need the packaging-only .npmrc / workspace file
 rm('-rf', 'work/app/.npmrc')
+rm('-rf', 'work/app/pnpm-workspace.yaml')
 rm('-rf', 'work/app/node_modules/.bin')
 // Remove axios browser/ESM builds and unnecessary files (keep only lib/ and node CJS)
 rm('-rf', 'work/app/node_modules/axios/dist/esm')
