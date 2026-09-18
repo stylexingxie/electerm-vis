@@ -15,6 +15,7 @@
     "pb": "node build/bin/prepare-electron-build.js",
     "build-win": "node build/bin/build-win-nsis.js",
     "icon": "node build/bin/gen-icon.js",
+    "preview-svg": "node build/bin/preview-svg.js",
     "postinstall": "node build/bin/post-install",
     "lint": "./node_modules/.bin/standard --verbose",
     "fix": "./node_modules/.bin/standard --fix",

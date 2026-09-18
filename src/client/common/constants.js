@@ -3,7 +3,6 @@
  */
 import { isMacJs } from './platform.js'
 import logoPath1Ref from '../assets/brand/vis-round-128x128.png'
-import logoPath2Ref from '../assets/brand/vis.png'
 import logoPath3Ref from '../assets/brand/vis-watermark.png'
 export const packInfo = typeof window.et.packInfo === 'undefined' ? window.pre.packInfo : window.et.packInfo
 const buildConst = (props) => {
@@ -16,7 +15,6 @@ const buildConst = (props) => {
 }
 
 export const logoPath1 = logoPath1Ref.replace(/^\//, '') + '?ver=' + packInfo.version
-export const logoPath2 = logoPath2Ref.replace(/^\//, '') + '?ver=' + packInfo.version
 export const logoPath3 = logoPath3Ref.replace(/^\//, '') + '?ver=' + packInfo.version
 export const maxEditFileSize = 1024 * 3000
 export const defaultBookmarkGroupId = 'default'

@@ -1,9 +1,9 @@
 import {
   logoPath1,
-  logoPath2,
   logoPath3,
   packInfo
 } from '../../common/constants'
+import chimpLogo from '../../assets/brand/vis-chimp.svg'
 import { Tag } from 'antd'
 import './logo.styl'
 
@@ -11,7 +11,7 @@ export default function LogoElem () {
   return (
     <h1 className='logo-elem mg3y font50'>
       <span className='iblock pd3 morph-shape mg1l mg1r'>
-        <img src={logoPath2} className='iblock mwm-100 mg1l mg1r logo-filter logo-img' />
+        <img src={chimpLogo} className='iblock mwm-100 mg1l mg1r logo-img' />
       </span>
       <img src={logoPath3} className='hide logo-img' />
       <sup>
