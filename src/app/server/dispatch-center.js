@@ -20,12 +20,15 @@ const {
 } = require('./terminal-api')
 const globalState = require('./global-state')
 const wsDec = require('./ws-dec')
+const { secureEqual } = require('../common/secure-compare')
 
 const { tokenElecterm } = process.env
 
 function verify (req) {
   const { token: to } = req.query
-  if (to !== tokenElecterm) {
+  // Constant-time compare: tokenElecterm is a per-startup random value, so the
+  // practical exposure is minimal, but a byte-wise early exit is free to avoid.
+  if (!secureEqual(to, tokenElecterm)) {
     throw new Error('not valid request')
   }
   // process.env.requireAuth holds the hashed login password (see

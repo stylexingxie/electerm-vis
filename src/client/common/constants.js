@@ -215,7 +215,6 @@ export const webAppHiddenSettings = [
   'hotkey',
   'opacity',
   'useSystemTitleBar',
-  'checkUpdateOnStart',
   'allowMultiInstance',
   'disableDeveloperTool'
 ]

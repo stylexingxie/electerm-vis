@@ -47,29 +47,30 @@ require('fs').writeFileSync(
   )
 )
 
-// electron-builder needs a flat, real-file node_modules for the packaged app:
-// pnpm's default symlinked layout hides every package behind
-// node_modules/.pnpm, which breaks `files` / `asarUnpack` glob matching (most
-// visibly the node-pty native binding). `node-linker=hoisted` produces an
-// npm-style tree for work/app only — the repository keeps pnpm's default.
-require('fs').writeFileSync(
-  resolve(__dirname, '../../work/app/.npmrc'),
-  'node-linker=hoisted\n'
-)
-
 // Without this file pnpm walks up and adopts the repository root as its
 // workspace: it reuses the root lockfile and runs the root project's
 // lifecycle scripts (whose devDependencies are absent under --prod).
 // A local pnpm-workspace.yaml makes work/app its own standalone root.
-// It also carries allowBuilds so native-module install scripts (node-pty,
-// @serialport/bindings-cpp) are allowed to run inside the packaged tree.
+//
+// It carries the two settings this packaging step depends on:
+//   - `nodeLinker: hoisted` — electron-builder needs a flat, real-file
+//     node_modules for the packaged app; pnpm's default symlinked layout hides
+//     every package behind node_modules/.pnpm, which breaks `files` /
+//     `asarUnpack` glob matching (most visibly the node-pty native binding).
+//   - `allowBuilds` — the native-module install scripts (node-pty,
+//     @serialport/bindings-cpp) must be allowed to run in the packaged tree.
+//
+// Both MUST live here rather than in an .npmrc: since pnpm 11 an .npmrc is only
+// read for auth/registry settings, so the `node-linker=hoisted` line this script
+// used to write was silently ignored — which is exactly why work/app kept coming
+// out as a symlinked tree no matter what the .npmrc said.
 require('fs').writeFileSync(
   resolve(__dirname, '../../work/app/pnpm-workspace.yaml'),
   [
-    "allowBuilds:",
+    'nodeLinker: hoisted',
+    'allowBuilds:',
     "  '@serialport/bindings-cpp': true",
     '  electron: true',
-    '  electron-winstaller: true',
     '  node-pty: true',
     ''
   ].join('\n')
@@ -140,22 +141,88 @@ if (isWin) {
   rm('-rf', 'work/app/node_modules/node-pty/deps/winpty')
 }
 
+const fs = require('fs')
+const path = require('path')
+
+/**
+ * Locate a package's real directory inside work/app/node_modules.
+ *
+ * Under pnpm's default (symlinked) layout a transitive dependency such as
+ * @serialport/bindings-cpp does not exist at node_modules/<pkg> at all — it
+ * only lives at node_modules/.pnpm/<parent>@<version>/node_modules/<pkg>.
+ * Resolving just the top-level path made the trim below skip the entire
+ * package, which is how 4.9 MB of foreign-platform binaries reached the
+ * installer. Try the direct path first (hoisted layout), then the store.
+ */
+const locatePackage = (name) => {
+  const modulesRoot = resolve(__dirname, '../../work/app/node_modules')
+  const direct = path.join(modulesRoot, ...name.split('/'))
+  if (fs.existsSync(direct)) {
+    return direct
+  }
+  const store = path.join(modulesRoot, '.pnpm')
+  if (!fs.existsSync(store)) {
+    return null
+  }
+  for (const entry of fs.readdirSync(store)) {
+    const candidate = path.join(store, entry, 'node_modules', ...name.split('/'))
+    if (fs.existsSync(candidate)) {
+      return candidate
+    }
+  }
+  return null
+}
+
+/** Remove every entry of `dir` except `keep`; returns how many were removed. */
+const keepOnly = (dir, keep) => {
+  if (!fs.existsSync(dir)) {
+    return 0
+  }
+  let removed = 0
+  for (const entry of fs.readdirSync(dir)) {
+    if (entry === keep) {
+      continue
+    }
+    const target = path.join(dir, entry)
+    rm('-rf', target)
+    // shelljs `rm` does not throw on failure. Verifying here matters: an
+    // unnoticed failed deletion is exactly how non-Windows prebuilds survive
+    // the trim and ship inside the installer.
+    if (fs.existsSync(target)) {
+      throw new Error(`prepare: failed to remove ${target}`)
+    }
+    removed++
+  }
+  return removed
+}
+
 // Windows-only build: drop the prebuilt native binaries for other platforms.
 // node-pty and @serialport/bindings-cpp ship node-gyp-build style prebuilds for
 // every platform/arch, and only the win32-x64 one can ever be loaded here.
 if (isWin) {
-  const fs = require('fs')
   for (const pkg of ['node-pty', '@serialport/bindings-cpp']) {
-    const prebuilds = resolve(
-      __dirname, '../../work/app/node_modules', pkg, 'prebuilds'
-    )
-    if (!fs.existsSync(prebuilds)) {
-      continue
+    const pkgDir = locatePackage(pkg)
+    if (!pkgDir) {
+      // Fail loudly. A silent skip here is precisely what let the
+      // non-Windows prebuilds ship inside the installer.
+      throw new Error(
+        `prepare: cannot locate ${pkg} under work/app/node_modules; ` +
+        'the non-win32-x64 prebuild trim cannot be applied'
+      )
     }
-    for (const entry of fs.readdirSync(prebuilds)) {
-      if (entry !== 'win32-x64') {
-        rm('-rf', `${prebuilds}/${entry}`)
-      }
+    const removed = keepOnly(path.join(pkgDir, 'prebuilds'), 'win32-x64')
+    echo(`trim ${pkg}/prebuilds: removed ${removed} non-win32-x64 dir(s)`)
+  }
+
+  // node-pty additionally ships a conpty build per arch under third_party/,
+  // which the prebuilds trim never touched (win10-arm64 was ~1.2 MB of dead
+  // weight on a Windows x64-only product).
+  const ptyDir = locatePackage('node-pty')
+  const conptyRoot = path.join(ptyDir, 'third_party', 'conpty')
+  if (fs.existsSync(conptyRoot)) {
+    for (const ver of fs.readdirSync(conptyRoot)) {
+      const removed = keepOnly(path.join(conptyRoot, ver), 'win10-x64')
+      echo(`trim node-pty/third_party/conpty/${ver}: removed ${removed} dir(s)`)
     }
   }
 }
@@ -165,6 +232,37 @@ rm('-rf', 'work/app/node_modules/node-pty/lib/*.test.js')
 rm('-rf', 'work/app/node_modules/node-pty/lib/*.test.js.map')
 rm('-rf', 'work/app/node_modules/node-pty/lib/testUtils.test.js')
 rm('-rf', 'work/app/node_modules/node-pty/lib/testUtils.test.js.map')
+
+// Drop third-party sourcemaps. They are pure debug artifacts in a shipped
+// app: ~6.5 MB across ~570 files, and they expose the bundled sources. The
+// renderer bundle is built without sourcemaps (vite default), so nothing in
+// the package can consume them. Symlinks are skipped so the pnpm store is
+// walked once, through .pnpm, rather than re-visited per top-level link.
+{
+  let maps = 0
+  const walk = (dir) => {
+    let entries
+    try {
+      entries = fs.readdirSync(dir, { withFileTypes: true })
+    } catch {
+      return
+    }
+    for (const e of entries) {
+      if (e.isSymbolicLink()) {
+        continue
+      }
+      const p = path.join(dir, e.name)
+      if (e.isDirectory()) {
+        walk(p)
+      } else if (e.name.endsWith('.map')) {
+        fs.rmSync(p, { force: true })
+        maps++
+      }
+    }
+  }
+  walk(resolve(__dirname, '../../work/app/node_modules'))
+  echo(`removed ${maps} sourcemap file(s)`)
+}
 
 // drop lockfiles generated inside the packaged app; the electron-builder
 // bundle does not need them

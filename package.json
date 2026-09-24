@@ -1,7 +1,7 @@
 {
   "name": "vis-remote-tool",
   "productName": "vis远程工具",
-  "version": "5.5.6-vis-rc2",
+  "version": "5.5.6-vis-rc3",
   "description": "VISYSTEM vis remote tool - terminal/ssh/telnet/serialport/sftp client (Windows)",
   "main": "app.js",
   "scripts": {
@@ -13,7 +13,8 @@
     "vite-build": "node build/bin/vite-build.js",
     "prepare-file": "node build/bin/prepare",
     "pb": "node build/bin/prepare-electron-build.js",
-    "build-win": "node build/bin/build-win-nsis.js",
+    "build-win": "node build/bin/build-win-nsis.js && node build/bin/verify-package.js",
+    "verify-package": "node build/bin/verify-package.js",
     "icon": "node build/bin/gen-icon.js",
     "preview-svg": "node build/bin/preview-svg.js",
     "postinstall": "node build/bin/post-install",
@@ -36,9 +37,9 @@
     "name": "产品市场部"
   },
   "engines": {
-    "node": ">=16.0.0"
+    "node": "^20.19.0 || >=22.12.0",
+    "pnpm": ">=11"
   },
-  "preferGlobal": true,
   "devDependencies": {
     "@ant-design/icons": "6.2.5",
     "@electerm/electerm-resource": "2.2.1",
@@ -121,11 +122,6 @@
     "trzsz2": "1.2.0",
     "zmodem2": "1.4.0"
   },
-  "files": [
-    "build/npm",
-    "README.md",
-    "LICENSE"
-  ],
   "standard": {
     "sourceType": "module",
     "ignore": [
@@ -142,17 +138,6 @@
       "onmessage",
       "requestAnimationFrame",
       "self"
-    ]
-  },
-  "allowScripts": {
-    "@serialport/bindings-cpp@13.0.0": true,
-    "node-pty@1.2.0-beta.15": true
-  },
-  "pnpm": {
-    "onlyBuiltDependencies": [
-      "@serialport/bindings-cpp",
-      "electron",
-      "node-pty"
     ]
   }
 }

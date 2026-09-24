@@ -9,12 +9,6 @@ if (-not (Test-Path $src)) {
 
 $img = [System.Drawing.Image]::FromFile($src)
 
-# vis.png: brand logo shown on the loading screen (index.pug) and the
-# about dialog — use the brand source image directly (500x500)
-$vis = Join-Path $brand 'vis.png'
-$img.Save($vis, [System.Drawing.Imaging.ImageFormat]::Png)
-Write-Output "written $vis"
-
 # vis-watermark.png: large faded watermark behind the loading screen —
 # render the brand image at low alpha onto a transparent canvas
 $canvas = 600

@@ -1,5 +1,9 @@
+# Single source of truth for which dependencies may run install/build scripts.
+# Modern pnpm (>=11) only reads auth/registry settings from .npmrc; every other
+# setting — including this one and `nodeLinker` — must live here (or in the
+# global config). Keeping a duplicate allowlist in package.json is therefore
+# both redundant and misleading.
 allowBuilds:
   '@serialport/bindings-cpp': true
   electron: true
-  electron-winstaller: true
   node-pty: true

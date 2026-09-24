@@ -17,16 +17,23 @@
     "node_modules/node-pty/build/Release/**",
     "node_modules/@serialport/bindings-cpp/prebuilds/**"
   ],
-  "artifactName": "${productName}-${version}-${os}-${arch}.${ext}",
+  "artifactName": "${productName}-${os}-${arch}.${ext}",
   "win": {
     "target": [
       "nsis"
     ],
-    "icon": "build-res/icon.ico"
+    "icon": "build-res/icon.ico",
+    "signtoolOptions": {
+      "signingHashAlgorithms": [
+        "sha256"
+      ],
+      "rfc3161TimeStampServer": "http://timestamp.digicert.com"
+    }
   },
   "nsis": {
     "oneClick": false,
-    "artifactName": "${productName}-${version}-${os}-${arch}-installer.${ext}",
-    "allowToChangeInstallationDirectory": true
+    "artifactName": "${productName}-${os}-${arch}-installer.${ext}",
+    "allowToChangeInstallationDirectory": true,
+    "deleteAppDataOnUninstall": false
   }
 }

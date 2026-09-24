@@ -178,7 +178,16 @@ describe('ssh proxy command', () => {
     fs.rmSync(tmpDir, { recursive: true, force: true })
   })
 
-  test('connects through netbird ssh proxy for netbird-like host', async () => {
+  // The fake `netbird` written by writeFakeNetbird() is a shebang script with no
+  // filename extension. Windows cannot spawn that, and the app spawns
+  // ELECTERM_NETBIRD_BIN directly (no shell), so the detection step fails and
+  // the session falls back to a direct connection, which then times out. These
+  // two cases therefore only run on POSIX hosts.
+  test('connects through netbird ssh proxy for netbird-like host', {
+    skip: process.platform === 'win32'
+      ? 'Windows cannot spawn an extension-less shebang script'
+      : false
+  }, async () => {
     const ws = createPromptWs()
     let term
     try {
@@ -242,7 +251,13 @@ describe('ssh proxy command', () => {
     assert.equal(r, null)
   })
 
-  test('explicit proxyCommand option connects through it', async () => {
+  // Same limitation as the test above: the fake `netbird` has no filename
+  // extension, so Windows cannot spawn it as a proxy command.
+  test('explicit proxyCommand option connects through it', {
+    skip: process.platform === 'win32'
+      ? 'Windows cannot spawn an extension-less shebang script'
+      : false
+  }, async () => {
     const ws = createPromptWs()
     let term
     try {

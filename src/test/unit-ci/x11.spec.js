@@ -68,7 +68,15 @@ describe('x11 helpers', () => {
     assert.equal(r, false)
   })
 
-  test('probeXServer: true when an endpoint accepts', async () => {
+  // Unix-domain sockets cannot be created on Windows — listen() on a filesystem
+  // path fails with EACCES — and getX11Candidates() already restricts win32 to
+  // TCP (see the 'windows: tcp only' case above). Skip instead of failing on a
+  // code path this platform never uses.
+  test('probeXServer: true when an endpoint accepts', {
+    skip: process.platform === 'win32'
+      ? 'unix domain sockets are not available on Windows'
+      : false
+  }, async () => {
     const sockPath = path.join(
       fs.mkdtempSync(path.join(os.tmpdir(), 'electerm-x11-')),
       'X0'

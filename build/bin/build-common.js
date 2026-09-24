@@ -59,6 +59,38 @@ exports.run = function (cmd) {
   })
 }
 
+/**
+ * Remove a path, retrying on failure, then throwing.
+ *
+ * shelljs `rm` reports failures on stderr but still resolves, and on Windows a
+ * freshly written file is frequently locked for a moment by the AV scanner or
+ * the search indexer — so a single-pass delete over a few thousand files
+ * reliably leaves stragglers behind (observed: 157 of 202 chunk files left
+ * undeleted, with the build continuing regardless). A silent partial delete is
+ * how a stale, untrimmed node_modules tree ends up inside the installer, so
+ * this retries and then fails loudly instead of returning success.
+ *
+ * @param {string} target absolute or cwd-relative path to remove
+ * @param {number} [attempts]
+ */
+exports.rmrfSync = function rmrfSync (target, attempts = 6) {
+  const fs = require('fs')
+  for (let i = 0; i < attempts; i++) {
+    rm('-rf', target)
+    if (!fs.existsSync(target)) {
+      return
+    }
+    // synchronous backoff; a transient lock is usually gone within ~1s
+    Atomics.wait(
+      new Int32Array(new SharedArrayBuffer(4)), 0, 0, 150 * (i + 1)
+    )
+  }
+  throw new Error(
+    `failed to remove ${target} after ${attempts} attempts; ` +
+    'refusing to continue on a partially cleaned tree'
+  )
+}
+
 exports.writeSrc = function (src) {
   const p = resolve(__dirname, '../../work/app/lib/install-src.js')
   writeFileSync(p, `module.exports = '${src}'`)

@@ -8,6 +8,7 @@ const {
 } = require('../common/runtime-constants')
 const initFileServer = require('../lib/file-server')
 const appDec = require('./app-wrap')
+const { secureEqual } = require('../common/secure-compare')
 
 appDec(app)
 
@@ -16,7 +17,9 @@ app.get('/run', function (req, res) {
 })
 app.post('/auth', function (req, res) {
   const { token } = req.body
-  if (token === process.env.requireAuth) {
+  // Constant-time compare: the token is the PBKDF2 digest of the login
+  // password, so a byte-wise early exit would leak it under timing analysis.
+  if (secureEqual(token, process.env.requireAuth)) {
     globalState.authed = true
   }
   res.send('ok')

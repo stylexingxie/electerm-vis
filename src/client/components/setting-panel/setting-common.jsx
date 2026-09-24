@@ -566,7 +566,6 @@ export default class SettingCommon extends Component {
             'initDefaultTabOnStart',
             'disableConnectionHistory',
             'disableTransferHistory',
-            'checkUpdateOnStart',
             'useSystemTitleBar',
             'confirmBeforeExit',
             'hideIP',

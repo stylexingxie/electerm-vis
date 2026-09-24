@@ -11,7 +11,12 @@ const findFreePort = require('find-free-port')
 const FtpSrv = require('@electerm/ftp-srv')
 const serialportModulePath = require.resolve('serialport')
 const serialportExports = require(serialportModulePath)
-const { MockBinding } = require('@serialport/binding-mock')
+// serialport re-exports its mock binding on SerialPortMock. Requiring
+// '@serialport/binding-mock' as a bare specifier cannot work here: under pnpm's
+// strict node_modules it is a dependency of serialport rather than of this
+// project, so it is not resolvable from this file (and upstream stopped
+// publishing it past 10.2.2 anyway).
+const MockBinding = serialportExports.SerialPortMock.binding
 
 const globalState = require('../../../src/app/server/global-state')
 const { Ftp } = require('../../../src/app/server/session-ftp')
