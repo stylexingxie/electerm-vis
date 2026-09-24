@@ -30,16 +30,8 @@ describe('custom theme then back to default', function () {
     })
     console.log('iterm themes:', JSON.stringify(itermInfo))
 
-    // create a custom theme via store (mimics 新主题 form submit)
-    const created = await client.evaluate(() => {
-      const { buildNewTheme } = window
-      const t = (window.buildNewTheme || (() => null))()
-      return null
-    })
-
     // build a custom theme using the same shape the form produces
     await client.evaluate(() => {
-      const convertThemeToText = null
       const theme = {
         id: 'testCustomTheme1',
         name: '测试主题A',

@@ -1,4 +1,17 @@
 #!/bin/bash
-cd `dirname $0`
-cd ../../
-npm run lint
+# Pre-push gate: run the project linter before allowing a push.
+#
+# This used to fail on Windows for a reason unrelated to the code: it ran an npm
+# script that invoked `./node_modules/.bin/standard`, a POSIX-only path that
+# cmd.exe cannot execute. With that script fixed this now reports real lint
+# results. Bypass a known-bad push with `git push --no-verify`.
+cd "$(dirname "$0")"
+cd ../..
+
+if [ ! -d node_modules ]; then
+  echo "pre-push: node_modules is missing, skipping lint (run 'pnpm install')" >&2
+  exit 0
+fi
+
+echo "pre-push: running lint..."
+npm run --silent lint

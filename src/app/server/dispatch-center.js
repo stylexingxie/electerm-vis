@@ -5,7 +5,6 @@
 
 const fs = require('./fs')
 const log = require('../common/log')
-const { transferKeys } = require('./transfer')
 const fetch = require('./fetch')
 const {
   createTerm,

@@ -41,7 +41,7 @@ describe('theme switch via real UI clicks', function () {
         if (!applyBtn) return 'no apply button in tooltip'
         applyBtn.click()
         return 'apply clicked'
-      }, )
+      })
       log(r2)
       await delay(800)
       return client.evaluate(() => window.store.config.theme)

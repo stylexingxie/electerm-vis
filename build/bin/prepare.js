@@ -57,8 +57,12 @@ require('fs').writeFileSync(
 //     node_modules for the packaged app; pnpm's default symlinked layout hides
 //     every package behind node_modules/.pnpm, which breaks `files` /
 //     `asarUnpack` glob matching (most visibly the node-pty native binding).
-//   - `allowBuilds` — the native-module install scripts (node-pty,
-//     @serialport/bindings-cpp) must be allowed to run in the packaged tree.
+//   - `allowBuilds` — the install scripts of the native/optional modules must be
+//     allowed to run in the packaged tree. The list has to be COMPLETE: a
+//     package with an install script that is left out fails the whole install
+//     with ERR_PNPM_IGNORED_BUILDS. `electron-winstaller` is easy to miss — it
+//     comes in transitively via electron-builder-squirrel-windows and lives
+//     under node_modules/.pnpm, so a top-level existence check cannot see it.
 //
 // Both MUST live here rather than in an .npmrc: since pnpm 11 an .npmrc is only
 // read for auth/registry settings, so the `node-linker=hoisted` line this script
@@ -71,6 +75,7 @@ require('fs').writeFileSync(
     'allowBuilds:',
     "  '@serialport/bindings-cpp': true",
     '  electron: true',
+    '  electron-winstaller: true',
     '  node-pty: true',
     ''
   ].join('\n')
