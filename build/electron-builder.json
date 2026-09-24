@@ -12,6 +12,21 @@
   "asar": true,
   "npmRebuild": false,
   "publish": null,
+  "files": [
+    "**/*",
+    "!**/*.map",
+    "!**/node_modules/node-pty/prebuilds/darwin-*/**",
+    "!**/node_modules/node-pty/prebuilds/linux-*/**",
+    "!**/node_modules/node-pty/prebuilds/win32-arm64/**",
+    "!**/node_modules/node-pty/prebuilds/win32-ia32/**",
+    "!**/node_modules/node-pty/third_party/conpty/*/win10-arm64/**",
+    "!**/node_modules/node-pty/lib/unixTerminal.js",
+    "!**/node_modules/@serialport/bindings-cpp/prebuilds/android-*/**",
+    "!**/node_modules/@serialport/bindings-cpp/prebuilds/darwin-*/**",
+    "!**/node_modules/@serialport/bindings-cpp/prebuilds/linux-*/**",
+    "!**/node_modules/@serialport/bindings-cpp/prebuilds/win32-arm64/**",
+    "!**/node_modules/@serialport/bindings-cpp/prebuilds/win32-ia32/**"
+  ],
   "asarUnpack": [
     "node_modules/node-pty/prebuilds/**",
     "node_modules/node-pty/build/Release/**",
