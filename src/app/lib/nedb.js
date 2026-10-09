@@ -6,9 +6,10 @@
 const { resolve } = require('path')
 const fs = require('fs')
 const Datastore = require('@electerm/nedb')
+const { dataFolderName } = require('../common/runtime-constants')
 
 // Tables whose stored data values should be encrypted at rest
-const ENC_TABLES = new Set(['bookmarks', 'profiles', 'data', 'history', 'terminalCommandHistory', 'aiChatHistory'])
+const ENC_TABLES = new Set(['bookmarks', 'profiles', 'data', 'history', 'terminalCommandHistory'])
 
 // Within the 'data' table, only this specific record is encrypted
 const DATA_ENC_ID = 'userConfig'
@@ -41,14 +42,14 @@ function createDb (appPath, defaultUserName, { enc, dec } = {}) {
     }
   }
 
-  const appDataPath = process.env.DATA_PATH || resolve(appPath, 'electerm')
+  const appDataPath = process.env.DATA_PATH || resolve(appPath, dataFolderName)
 
   if (!fs.existsSync(appDataPath)) {
     fs.mkdirSync(appDataPath, { recursive: true })
   }
 
   const reso = (name) => {
-    return resolve(appDataPath, 'users', defaultUserName, `electerm.${name}.nedb`)
+    return resolve(appDataPath, 'users', defaultUserName, `${dataFolderName}.${name}.nedb`)
   }
   const tables = [
     'bookmarks',
@@ -65,7 +66,6 @@ function createDb (appPath, defaultUserName, { enc, dec } = {}) {
     'triggers',
     'history',
     'terminalCommandHistory',
-    'aiChatHistory',
     'autoRunWidgets'
   ]
 

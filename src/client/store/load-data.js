@@ -328,15 +328,6 @@ export default (Store) => {
         },
         1000
       )
-      setTimeout(
-        () => {
-          store.autoSyncReady = true
-        },
-        2000
-      )
-      if (store.config.checkUpdateOnStart) {
-        store.onCheckUpdate(false)
-      }
       store.startAutoRunWidgets().catch(err => {
         console.error('Failed to start autorun widgets:', err)
       })
@@ -351,24 +342,6 @@ export default (Store) => {
   }
   Store.prototype.addTabFromCommandLine = (event, opts) => {
     addTabFromCommandLine(window.store, opts)
-  }
-  Store.prototype.checkPendingDeepLink = async function () {
-    const pending = await window.pre.runGlobalAsync('getPendingDeepLink')
-    if (pending) {
-      window.store.ipcOpenTab(pending)
-    }
-  }
-  /**
-   * A .vv file that arrived before the window existed -- macOS delivers
-   * 'open-file' during launch, so a cold double-click always lands here. The
-   * payload is the same shape initCommandLine() returns, so it goes through the
-   * same entry point as `electerm /path/to/console.vv`.
-   */
-  Store.prototype.checkPendingVvFile = async function () {
-    const pending = await window.pre.runGlobalAsync('getPendingVvFile')
-    if (pending) {
-      addTabFromCommandLine(window.store, pending)
-    }
   }
   Store.prototype.parseQuickConnect = function (url) {
     return parseQuickConnect(url)

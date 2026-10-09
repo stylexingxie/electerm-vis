@@ -1,0 +1,10 @@
+{
+  "name": "@electerm/electerm-locales",
+  "version": "2.3.17",
+  "private": true,
+  "description": "Vendored copy of @electerm/electerm-locales (MIT) with VISYSTEM brand copy applied. Upstream: https://github.com/electerm/electerm-locales",
+  "main": "./dist/cjs/index.js",
+  "type": "module",
+  "author": "ZHAO Xudong <zxdong@gmail.com>",
+  "license": "MIT"
+}

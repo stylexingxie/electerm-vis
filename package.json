@@ -1,63 +1,52 @@
 {
-  "name": "electerm",
-  "version": "5.5.79",
-  "description": "Open-sourced terminal/ssh/sftp/telnet/serialport/RDP/VNC/Spice/ftp client(Linux, Mac, Windows, Android, HarmonyOS, iOS).",
+  "name": "vis-remote-tool",
+  "productName": "vis远程工具",
+  "version": "5.5.79-vis-rc4",
+  "description": "VISYSTEM vis remote tool - terminal/ssh/telnet/serialport/sftp client (Windows)",
   "main": "app.js",
   "scripts": {
     "app": "node build/bin/app",
-    "build": "npm run vite-build",
+    "build": "node build/bin/vite-build.js",
     "start": "node build/bin/start.js",
-    "icon": "node build/bin/icon",
     "clean": "node build/bin/clean",
     "compile": "node build/bin/build",
     "vite-build": "node build/bin/vite-build.js",
     "prepare-file": "node build/bin/prepare",
     "pb": "node build/bin/prepare-electron-build.js",
     "prepare-test": "PLAYWRIGHT_SKIP_BROWSER_DOWNLOAD=1 npm i -E playwright@1.49.1 --no-save && npm i -E @playwright/test@1.49.1 --no-save",
+    "build-win": "node build/bin/build-win-nsis.js && node build/bin/verify-package.js",
+    "verify-package": "node build/bin/verify-package.js",
+    "icon": "node build/bin/gen-icon.js",
+    "preview-svg": "node build/bin/preview-svg.js",
     "postinstall": "node build/bin/post-install",
-    "lint": "./node_modules/.bin/standard --verbose",
-    "fix": "./node_modules/.bin/standard --fix",
-    "test": "npm run test1 && npm run test2",
-    "test-unit-ci": "node --test src/test/unit-ci/*.spec.js",
-    "test-integration": "node --test src/test/integration/*.spec.js",
-    "test1": "./node_modules/.bin/playwright test src/test/e2e/00*.js --workers=1 --workers=1",
-    "test2": "./node_modules/.bin/playwright test src/test/e2e/01*.js --workers=1",
-    "test3": "./node_modules/.bin/playwright test src/test/e2e/02*.js --workers=1 && npm run test-unit-ci",
-    "test4": "./node_modules/.bin/playwright test src/test/e2e/03*.js --workers=1",
+    "lint": "standard --verbose",
+    "fix": "standard --fix",
+    "test": "playwright test src/test/e2e/zz-debug.spec.js --workers=1 && playwright test src/test/e2e/01*.js --workers=1",
+    "test-unit-ci": "node --test --test-force-exit src/test/unit-ci/*.spec.js",
+    "test-integration": "node --test --test-force-exit src/test/integration/*.spec.js",
+    "test1": "playwright test src/test/e2e/zz-debug.spec.js --workers=1",
+    "test2": "playwright test src/test/e2e/01*.js --workers=1",
+    "test3": "playwright test src/test/e2e/02*.js --workers=1 && node --test --test-force-exit src/test/unit-ci/*.spec.js",
+    "test4": "playwright test src/test/e2e/03*.js --workers=1",
     "clean-test-server": "node build/bin/clean-test-server-home.js",
-    "b": "npm run clean && npm run compile && npm run prepare-file",
-    "r": "./build/bin/release",
-    "w": "./build/bin/web-release",
-    "t": "./node_modules/.bin/electron work/app/app.js",
-    "lock": "npm i --package-lock-only"
+    "b": "node build/bin/clean && node build/bin/build && node build/bin/prepare",
+    "t": "electron work/app/app.js",
+    "lock": "pnpm install --lockfile-only"
   },
   "license": "MIT",
-  "languageRepo": "https://github.com/electerm/electerm-locales",
-  "privacyNoticeLink": "https://github.com/electerm/electerm/wiki/privacy-notice",
-  "knownIssuesLink": "https://github.com/electerm/electerm/wiki/Know-issues",
-  "sponsorLink": "https://electerm.org/sponsor-electerm",
-  "repository": {
-    "type": "git",
-    "url": "git+https://github.com/electerm/electerm.git"
-  },
   "author": {
-    "name": "ZHAO Xudong",
-    "email": "zxdong@gmail.com",
-    "url": "https://github.com/zxdong262"
+    "name": "产品市场部"
   },
-  "bugs": {
-    "url": "https://github.com/electerm/electerm/issues"
-  },
-  "homepage": "https://electerm.org",
-  "releases": "https://github.com/electerm/electerm/releases",
   "engines": {
-    "node": ">=16.0.0"
+    "node": "^20.19.0 || >=22.12.0",
+    "pnpm": ">=11"
   },
   "devDependencies": {
     "@ant-design/icons": "6.2.5",
     "@electerm/electerm-resource": "2.2.1",
     "@fontsource/maple-mono": "^5.2.5",
     "@novnc/novnc": "1.7.0",
+    "@playwright/test": "1.63.0",
     "@types/node": "22.9.3",
     "@vitejs/plugin-react": "^5.2.0",
     "@xterm/addon-attach": "0.13.0-beta.292",
@@ -81,10 +70,12 @@
     "filesize-parser": "1.5.1",
     "glob": "^13.0.6",
     "ironrdp-wasm": "1.1.0",
+    "lodash": "^4.18.1",
     "lodash-es": "^4.17.21",
     "manate": "2.0.3",
     "morgan": "^1.12.0",
     "multer": "^2.3.0",
+    "png-to-ico": "^3.0.2",
     "pug": "3.0.4",
     "react": "19.2.7",
     "react-diff-viewer-continued": "4.4.0",
@@ -108,8 +99,8 @@
     "axios": "1.18.1",
     "basic-ftp": "6.0.1",
     "commander": "12.1.0",
+    "dayjs": "1.11.23",
     "diffie-hellman": "^5.0.3",
-    "electerm-sync": "2.0.1",
     "electron-log": "4.3.5",
     "express": "5.2.1",
     "express-ws": "5.0.2",
@@ -170,9 +161,5 @@
       "requestAnimationFrame",
       "self"
     ]
-  },
-  "allowScripts": {
-    "@serialport/bindings-cpp@13.0.0": true,
-    "node-pty@1.2.0-beta.15": true
   }
 }

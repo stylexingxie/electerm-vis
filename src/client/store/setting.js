@@ -7,14 +7,11 @@ import copy from 'json-deep-copy'
 import {
   settingMap,
   settingCommonId,
-  settingSyncId,
   modals
 } from '../common/constants'
 import { buildNewTheme } from '../common/terminal-theme'
 import getInitItem from '../common/init-setting-item'
 import newTerm from '../common/new-terminal'
-import settingList from '../common/setting-list'
-import { requireTermOfUse } from '../common/term-of-use'
 
 const e = window.translate
 
@@ -94,28 +91,6 @@ export default Store => {
     store.settingTab = settingMap.setting
     store.setSettingItem(getInitItem([], settingMap.setting))
     store.openSettingModal()
-  }
-
-  Store.prototype.openSettingSync = function () {
-    const { store } = window
-    if (
-      store.settingTab === settingMap.setting &&
-      store.settingItem.id === settingList()[0].id &&
-      store.showModal === modals.setting
-    ) {
-      return store.hideSettingModal()
-    }
-    requireTermOfUse('sync', () => {
-      store.storeAssign({
-        settingTab: settingMap.setting
-      })
-      store.setSettingItem(settingList().find(d => d.id === settingSyncId))
-      store.openSettingModal()
-      // on mobile, jump straight to the sync form instead of the menu list
-      if (store.isMobile) {
-        store.settingMobileView = 'content'
-      }
-    })
   }
 
   Store.prototype.openTerminalThemes = function () {

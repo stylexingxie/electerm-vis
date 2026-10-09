@@ -1,11 +1,9 @@
 import { useEffect } from 'react'
 import {
   InfoCircleOutlined,
-  UpCircleOutlined,
   AimOutlined,
   MenuFoldOutlined
 } from '@ant-design/icons'
-import { Tooltip } from 'antd'
 import SideBarPanel from './sidebar-panel'
 import MenuBtn from '../sys-menu/menu-btn'
 import {
@@ -24,10 +22,8 @@ const e = window.translate
 export default function Sidebar (props) {
   const {
     height,
-    upgradeInfo,
     settingTab,
     settingItem,
-    isSyncingSetting,
     // expandable bookmarks/history panel
     leftSidePanelWidth,
     // far-left icon bar (43px; 0 when hidden)
@@ -95,10 +91,6 @@ export default function Sidebar (props) {
     store.openLeftSidePanel()
   }
 
-  const handleShowUpgrade = () => {
-    window.store.upgradeInfo.showUpgradeModal = true
-  }
-
   const handleZoomReset = () => {
     store.onZoomReset()
   }
@@ -111,19 +103,11 @@ export default function Sidebar (props) {
     onNewSsh,
     openSetting,
     openAbout,
-    openSettingSync,
     openTerminalThemes,
     setLeftSidePanelWidth
   } = store
-  const {
-    showUpgradeModal,
-    upgradePercent,
-    checkingRemoteVersion,
-    shouldUpgrade
-  } = upgradeInfo
   const showSetting = showModal === modals.setting
   const settingActive = showSetting && settingTab === settingMap.setting && settingItem.id === 'setting-common'
-  const syncActive = showSetting && settingTab === settingMap.setting && settingItem.id === 'setting-sync'
   const themeActive = showSetting && settingTab === settingMap.terminalThemes
   const bookmarksActive = showSetting && settingTab === settingMap.bookmarks
   const widgetsActive = showSetting && settingTab === settingMap.widgets
@@ -160,15 +144,12 @@ export default function Sidebar (props) {
           handleClickBookmark={handleClickBookmark}
           onNewSsh={onNewSsh}
           openSetting={openSetting}
-          openSettingSync={openSettingSync}
           openTerminalThemes={openTerminalThemes}
           openWidgetsModal={openWidgetsModal}
           bookmarksActive={bookmarksActive}
           themeActive={themeActive}
           settingActive={settingActive}
-          syncActive={syncActive}
           widgetsActive={widgetsActive}
-          isSyncingSetting={isSyncingSetting}
           widgetInstancesLength={widgetInstancesLength}
         />
         <TransferList {...transferProps} />
@@ -200,25 +181,6 @@ export default function Sidebar (props) {
                   onClick={handleZoomReset}
                 />
               </SideIcon>
-              )
-            : null
-        }
-        {
-          !checkingRemoteVersion && !showUpgradeModal && shouldUpgrade
-            ? (
-              <Tooltip
-                title={`${e('upgrading')} ${upgradePercent || 0}%`}
-                placement='right'
-              >
-                <div
-                  className='control-icon-wrap'
-                >
-                  <UpCircleOutlined
-                    className='iblock font18 control-icon upgrade-icon'
-                    onClick={handleShowUpgrade}
-                  />
-                </div>
-              </Tooltip>
               )
             : null
         }

@@ -9,7 +9,7 @@ import createName, { createTitleTag } from '../../common/create-title'
 import classnames from 'classnames'
 import { noop } from 'lodash-es'
 import highlight from '../common/highlight'
-import { staticNewItemTabs, undeletableIds } from '../../common/constants'
+import { settingCommonId, staticNewItemTabs } from '../../common/constants'
 import getInitItem from '../../common/init-setting-item'
 
 const e = window.translate
@@ -64,7 +64,7 @@ export default class ItemList extends React.PureComponent {
   }
 
   renderDelBtn = item => {
-    if (!item.id || undeletableIds.has(item.id)) {
+    if (!item.id || [settingCommonId].includes(item.id) || item.id.startsWith('default')) {
       return null
     }
     const { shouldConfirmDel } = this.props

@@ -28,7 +28,6 @@ module.exports = exports.default = {
   terminalType: 'xterm-256color',
   keepaliveCountMax: 10,
   saveTerminalLogToFile: false,
-  checkUpdateOnStart: true,
   cursorBlink: false,
   cursorStyle: 'block',
   useSystemTitleBar: false,
@@ -71,13 +70,6 @@ module.exports = exports.default = {
   ],
   hideIP: false,
   dataSyncSelected: 'all',
-  nameAI: '',
-  baseURLAI: 'https://fluxionai.world/v1',
-  modelAI: 'deepseek-v4-flash-0731',
-  roleAI: '终端专家,提供不同系统下命令,简要解释用法,用markdown格式',
-  apiPathAI: '/chat/completions',
-  authHeaderNameAI: 'Authorization: Bearer',
-  proxyAI: '',
   sessionLogPath: '',
   sshSftpSplitView: false,
   showCmdSuggestions: false,
@@ -98,7 +90,6 @@ module.exports = exports.default = {
     'bookmarks',
     'terminalThemes',
     'setting',
-    'settingSync',
     'widgets'
   ]
 }

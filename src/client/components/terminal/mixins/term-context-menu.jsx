@@ -3,8 +3,6 @@ import { readClipboardAsync, readClipboard, copy } from '../../../common/clipboa
 import { isWin, isMac, isMacJs, connectionMap } from '../../../common/constants.js'
 import iconsMap from '../../sys-menu/icons-map.jsx'
 import { refsStatic } from '../../common/ref.js'
-import AIIcon from '../../icons/ai-icon.jsx'
-import { isAIDisabled } from '../../../common/ai-feature.js'
 
 const e = window.translate
 
@@ -49,28 +47,6 @@ export const contextMenuMixin = {
         label: e('selectall'),
         extra: selectAllShortcut
       },
-      // Touch only: a selection dragged out on the canvas can only ever be an
-      // approximation of a native one, so offer the overlay where the OS does
-      // the selecting (see term-touch.js / terminal-select-text.jsx).
-      ...(
-        this.isTouchMode()
-          ? [{
-              key: 'onSelectTextMode',
-              icon: <iconsMap.SelectOutlined />,
-              label: e('selectText')
-            }]
-          : []
-      ),
-      ...(
-        isAIDisabled()
-          ? []
-          : [{
-              key: 'explainWithAi',
-              icon: <AIIcon />,
-              label: e('explainWithAi'),
-              disabled: !hasSelection
-            }]
-      ),
       {
         key: 'onClear',
         icon: <iconsMap.ReloadOutlined />,
@@ -259,12 +235,6 @@ export const contextMenuMixin = {
       this.xmodemClient.initiateReceive()
     }
     this.term.focus()
-  },
-
-  explainWithAi () {
-    window.store.explainWithAi(
-      this.term.getSelection()
-    )
   },
 
   // ---- shortcut handlers, wired up by shortcutExtend ----

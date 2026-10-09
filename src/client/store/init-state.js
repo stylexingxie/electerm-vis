@@ -5,7 +5,6 @@ import {
   settingMap,
   defaultBookmarkGroupId,
   fileOperationsMap,
-  syncTypes,
   infoTabs,
   openedSidebarKey,
   sidebarPinnedKey,
@@ -24,10 +23,7 @@ import {
   addPanelWidthLsKey,
   qmSortByFrequencyKey,
   resolutionsLsKey,
-  syncServerDataKey,
   splitMap,
-  lastAiChatSessionIdKey,
-  aiAutoCompressLsKey,
   mobileBreakpoint
 } from '../common/constants'
 import * as ls from '../common/safe-local-storage'
@@ -96,18 +92,6 @@ export default () => {
 
     // batch input selected tab ids
     _batchInputSelectedTabIds: new Set(),
-    aiChatHistory: [],
-    agentRunning: false,
-    // ask turns and the agent loop compact their conversation when the window
-    // gets full; persisted here so the toggle survives a reload
-    // (see components/ai/ai-compress.js)
-    aiAutoCompress: ls.getItem(aiAutoCompressLsKey) === 'true',
-    // live context accounting while an agent loop is running: the agent
-    // carries tool schemas and tool results that the session history does
-    // not, so it publishes its own figure here (see components/ai/agent.js)
-    aiContextInfo: null,
-    currentChatSessionId: window.localStorage.getItem(lastAiChatSessionIdKey) || '',
-    showChatSessions: false,
 
     // sftp
     fileOperation: fileOperationsMap.cp, // cp or mv
@@ -141,7 +125,6 @@ export default () => {
     cmdHistoryInRightPanel: ls.getItem(cmdHistoryInRightPanelKey) === 'true',
     quickCommandsInRightPanel: ls.getItem(quickCommandsInRightPanelKey) === 'true',
     _rightPanelWidth: parseInt(ls.getItem(rightSidebarWidthKey), 10) || 500,
-    showAIConfigModal: false,
 
     // for settings related
     settingItem: initSettingItem([], settingMap.bookmarks),
@@ -150,15 +133,6 @@ export default () => {
     showModal: 0,
     // mobile settings view: 'menu' (left col list, default) or 'content' (right col)
     settingMobileView: 'menu',
-
-    // setting sync related
-    autoSyncReady: false,
-    isSyncingSetting: false,
-    isSyncUpload: false,
-    isSyncDownload: false,
-    syncType: syncTypes.github,
-    // syncServerData: {},
-    syncServerStatus: ls.getItemJSON(syncServerDataKey, {}),
 
     // term search
     termSearchOpen: false,
@@ -213,9 +187,6 @@ export default () => {
 
     // file/info modal
     showFileModal: false,
-
-    // update
-    upgradeInfo: {},
 
     // serial list related
     serials: [],

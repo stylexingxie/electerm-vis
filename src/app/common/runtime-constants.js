@@ -18,16 +18,16 @@ const iconPath = resolve(
   __dirname,
   (
     isDev
-      ? '../../../node_modules/@electerm/electerm-resource/res/imgs/electerm-round-128x128.png'
-      : '../assets/images/electerm-round-128x128.png'
+      ? '../../../src/client/assets/brand/vis-round-128x128.png'
+      : '../assets/images/vis-round-128x128.png'
   )
 )
 const trayIconPath = resolve(
   __dirname,
   (
     isDev
-      ? '../../../node_modules/@electerm/electerm-resource/tray-icons/electerm-tray.png'
-      : '../assets/images/electerm-tray.png'
+      ? '../../../src/client/assets/brand/vis-tray.png'
+      : '../assets/images/vis-tray.png'
   )
 )
 const extIconPath = isDev
@@ -35,6 +35,13 @@ const extIconPath = isDev
   : 'icons/'
 
 const defaultUserName = require('./default-user-name')
+const packInfo = require(isDev ? '../../../package.json' : '../package.json')
+
+// Folder this app uses under the OS app-data directory (databases, per-user
+// data, local-storage keys). Derived from the package name so a renamed build
+// never reads or writes another application's data — it used to be hard-coded
+// to 'electerm', which made this build open the upstream app's database.
+const dataFolderName = packInfo.name
 
 module.exports = {
   isTest: !!NODE_TEST,
@@ -47,10 +54,11 @@ module.exports = {
   trayIconPath,
   extIconPath,
   defaultUserName,
-  minWindowWidth: 320,
+  dataFolderName,
+  minWindowWidth: 590,
   minWindowHeight: 400,
-  defaultLang: 'en_us',
+  defaultLang: 'zh_cn',
   tempDir: require('os').tmpdir(),
   homeOrTmp: os.homedir() || os.tmpdir(),
-  packInfo: require(isDev ? '../../../package.json' : '../package.json')
+  packInfo
 }

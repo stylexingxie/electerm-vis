@@ -6,8 +6,6 @@ import initState from './init-state'
 import loadDataExtend from './load-data'
 import dbUpgradeExtend from './db-upgrade'
 import eventExtend from './event'
-import syncExtend from './sync'
-import appUpgradeExtend from './app-upgrade'
 import bookmarkGroupExtend from './bookmark-group'
 import bookmarkExtend from './bookmark'
 import commonExtend from './common'
@@ -26,13 +24,11 @@ import batchInputHistory from './batch-input-history'
 import transferExtend from './transfer-list'
 import addressBookmarkExtend from './address-bookmark'
 import widgetsExtend from './widgets'
-import mcpHandlerExtend from './mcp-handler'
 import workspaceExtend from './workspace'
 import isColorDark from '../common/is-color-dark'
 import { getReverseColor } from '../common/reverse-color'
 import { uniq } from 'lodash-es'
 import deepCopy from 'json-deep-copy'
-import getBrand from '../components/ai/get-brand'
 import {
   settingMap,
   terminalSshConfigType,
@@ -164,21 +160,6 @@ class Store {
   }
 
   get rightPanelTitle () {
-    const {
-      rightPanelTab,
-      config: {
-        baseURLAI
-      }
-    } = window.store
-    if (rightPanelTab === 'ai') {
-      return getBrand(baseURLAI).brand || 'Custom AI Model'
-    }
-    if (rightPanelTab === 'cmdHistory') {
-      return window.translate('cmdHistory')
-    }
-    if (rightPanelTab === 'quickCommands') {
-      return window.translate('quickCommands')
-    }
     return createTitle(window.store.currentTab)
   }
 
@@ -347,8 +328,6 @@ class Store {
 loadDataExtend(Store)
 eventExtend(Store)
 dbUpgradeExtend(Store)
-syncExtend(Store)
-appUpgradeExtend(Store)
 bookmarkGroupExtend(Store)
 bookmarkExtend(Store)
 commonExtend(Store)
@@ -367,7 +346,6 @@ batchInputHistory(Store)
 transferExtend(Store)
 addressBookmarkExtend(Store)
 widgetsExtend(Store)
-mcpHandlerExtend(Store)
 workspaceExtend(Store)
 
 export const StateStore = Store

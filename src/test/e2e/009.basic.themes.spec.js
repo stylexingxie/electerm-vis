@@ -44,10 +44,21 @@ describe('terminal themes', function () {
     })
     await client.click('.setting-wrap .ant-btn-primary:visible')
 
-    const themeNow = await client.evaluate(() => {
-      return window.store.terminalThemes.length
-    })
-    await delay(1000)
+    // Saving a theme is asynchronous, so reading the store immediately after the
+    // click races the update. This is what made the spec flaky: the fixed delay
+    // used to sit *after* the read, so it never covered the gap at all. Poll
+    // until the new theme lands instead.
+    let themeNow = themePrev
+    const deadline = Date.now() + 10000
+    while (Date.now() < deadline) {
+      themeNow = await client.evaluate(() => {
+        return window.store.terminalThemes.length
+      })
+      if (themeNow === themePrev + 1) {
+        break
+      }
+      await delay(200)
+    }
     expect(themeNow).equal(themePrev + 1)
     expect(themeIterm > 10).equal(true)
     await electronApp.close().catch(console.log)

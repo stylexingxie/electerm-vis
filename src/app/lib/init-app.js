@@ -18,7 +18,7 @@ function capitalizeFirstLetter (string) {
 
 function initApp (langMap, config) {
   globalState.set('langMap', langMap)
-  globalState.set('getLang', (lang = config.language || 'en_us') => {
+  globalState.set('getLang', (lang = config.language || 'zh_cn') => {
     return langMap[lang].lang
   })
   globalState.set('translate', txt => {

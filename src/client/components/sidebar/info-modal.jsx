@@ -1,16 +1,8 @@
 import {
-  GithubOutlined,
-  GlobalOutlined,
-  HighlightOutlined,
-  HomeOutlined,
   UserOutlined,
-  InfoCircleOutlined,
-  AlignLeftOutlined,
-  BugOutlined,
-  HeartOutlined,
-  CloudOutlined
+  InfoCircleOutlined
 } from '@ant-design/icons'
-import { Tabs, Button } from 'antd'
+import { Tabs } from 'antd'
 import Modal from '../common/modal'
 import Link from '../common/external-link'
 import LogoElem from '../common/logo-elem'
@@ -23,10 +15,13 @@ import {
   packInfo,
   infoTabs
 } from '../../common/constants'
-import { checkSkipSrc } from '../../common/check-skip-src'
 import './info.styl'
 
 const e = window.translate
+
+// Upstream project this build is derived from. Kept here (and in the about tab
+// below) so the original authorship/attribution stays visible in the UI.
+const upstreamRepo = 'https://github.com/electerm/electerm'
 
 export default auto(function InfoModal (props) {
   const [runtimeEnv, setRuntimeEnv] = useState(null)
@@ -36,79 +31,6 @@ export default auto(function InfoModal (props) {
     if (key === infoTabs.env && !runtimeEnv) {
       window.pre.runGlobalAsync('getEnv').then(env => setRuntimeEnv(env))
     }
-  }
-
-  const renderCheckUpdate = () => {
-    if (window.et.disableUpgradeCheck || checkSkipSrc(props.installSrc)) {
-      return null
-    }
-    const {
-      onCheckUpdate
-    } = window.store
-    const {
-      upgradeInfo
-    } = props
-    const onCheckUpdating = upgradeInfo.checkingRemoteVersion || upgradeInfo.upgrading
-    const { noUpdateMessage, noUpdateMessageExpires } = upgradeInfo
-    const showMessage = noUpdateMessage && noUpdateMessageExpires && Date.now() < noUpdateMessageExpires
-    return (
-      <div className='mg1b mg2t'>
-        <Button
-          type='primary'
-          loading={onCheckUpdating}
-          onClick={() => onCheckUpdate(true)}
-        >
-          {e('checkForUpdate')}
-        </Button>
-        {showMessage && (
-          <span className='mg1l update-msg'>{noUpdateMessage}</span>
-        )}
-      </div>
-    )
-  }
-
-  const renderParsed = (obj, depth = 0) => {
-    if (Array.isArray(obj)) {
-      return (
-        <ul className='pd2l'>
-          {obj.map((item, i) => (
-            <li key={i}>{renderParsed(item, depth + 1)}</li>
-          ))}
-        </ul>
-      )
-    } else if (typeof obj === 'object' && obj !== null) {
-      return (
-        <div className={depth > 0 ? 'pd2l' : ''}>
-          {Object.entries(obj).map(([k, v]) => (
-            <div key={k} className='pd1b'>
-              <b>{k}:</b> {renderParsed(v, depth + 1)}
-            </div>
-          ))}
-        </div>
-      )
-    } else {
-      return <span>{String(obj)}</span>
-    }
-  }
-
-  const renderValue = (v) => {
-    try {
-      const parsed = JSON.parse(v)
-      return renderParsed(parsed)
-    } catch {
-      return <span>{v}</span>
-    }
-  }
-
-  const renderOSInfo = () => {
-    return window.pre.osInfo().map(({ k, v }, i) => (
-      <div className='pd1b' key={i + '_os_' + k}>
-        <b className='bold'>{k}:</b>
-        <span className='mg1l'>
-          {renderValue(v)}
-        </span>
-      </div>
-    ))
   }
 
   const { infoModalTab, commandLineHelp } = props
@@ -123,26 +45,14 @@ export default auto(function InfoModal (props) {
   }
   const {
     name,
-    // description,
+    version,
     devDependencies,
     dependencies,
-    languageRepo,
-    privacyNoticeLink,
     author: {
       name: authorName,
-      email,
-      url: authorUrl
-    },
-    homepage,
-    bugs: {
-      url: bugReportLink
-    },
-    releases: releaseLink,
-    sponsorLink,
-    knownIssuesLink
+      email
+    }
   } = packInfo
-  const electermOnline = 'https://cloud.electerm.org'
-  const link = releaseLink.replace('/releases', '')
   const { versions } = window.pre
   const deps = {
     ...devDependencies,
@@ -175,69 +85,22 @@ export default auto(function InfoModal (props) {
           <p className='mg2b'>{e('desc')}</p>
           <RunningTime />
           <p className='mg1b'>
-            <HomeOutlined /> <b>{e('homepage')}/{e('download')} ➾</b>
-            <Link to={homepage} className='mg1l'>
-              {homepage}
+            <b className='mg1r'>Version:</b>
+            <span className='mg1l'>{version}</span>
+          </p>
+          <p className='mg1b'>
+            <InfoCircleOutlined /> <b className='mg1r'>本工具基于 electerm 构建</b>
+            <Link to={upstreamRepo} className='mg1l'>
+              {upstreamRepo}
             </Link>
           </p>
           <p className='mg1b'>
             <UserOutlined /> <b className='mg1r'>{e('author')} ➾</b>
-            <Link to={authorUrl} className='mg1l'>
-              {authorName} ({email})
-            </Link>
-          </p>
-          <p className='mg1b'>
-            <GithubOutlined /> <b className='mg1r'>github ➾</b>
-            <Link to={link} className='mg1l'>
-              {link}
-            </Link>
-          </p>
-          <p className='mg1b'>
-            <GlobalOutlined /> <b className='mg1r'>{e('language')} repo ➾</b>
-            <Link to={languageRepo} className='mg1l'>
-              {languageRepo}
-            </Link>
-          </p>
-          <p className='mg1b'>
-            <BugOutlined /> <b className='mg1r'>{e('bugReport')} ➾</b>
-            <Link to={bugReportLink} className='mg1l'>
-              {bugReportLink}
-            </Link>
-          </p>
-          <p className='mg1b'>
-            <InfoCircleOutlined /> <b className='mg1r'>{e('privacyNotice')} ➾</b>
-            <Link to={privacyNoticeLink} className='mg1l'>
-              {privacyNoticeLink}
-            </Link>
-          </p>
-          <p className='mg1b'>
-            <HighlightOutlined /> <b className='mg1r'>{e('changeLog')} ➾</b>
-            <Link to={releaseLink} className='mg1l'>
-              {releaseLink}
-            </Link>
-          </p>
-          <p className='mg1b'>
-            <AlignLeftOutlined /> <b className='mg1r'>{e('knownIssues')} ➾</b>
-            <Link to={knownIssuesLink} className='mg1l'>
-              {knownIssuesLink}
-            </Link>
-          </p>
-          <p className='mg1b'>
-            <CloudOutlined /> <b className='mg1r'>electerm Online ➾</b>
-            <Link to={electermOnline} className='mg1l'>
-              {electermOnline}
-            </Link>
-          </p>
-          <p className='mg1b'>
-            <HeartOutlined /> <b className='mg1r'>{e('sponsorElecterm')} ➾</b>
-            <Link to={sponsorLink} className='mg1l'>
-              {sponsorLink}
-            </Link>
+            <span className='mg1l'>{authorName}{email ? ` (${email})` : ''}</span>
           </p>
           <p className='mg1b'>
             <InfoCircleOutlined /> <b className='mg1r'>{window.store.installSrc}</b>
           </p>
-          {renderCheckUpdate()}
           <Placeholder />
         </>
       )
@@ -271,11 +134,6 @@ export default auto(function InfoModal (props) {
           </div>
         )
       })
-    },
-    {
-      key: infoTabs.os,
-      label: e('os'),
-      children: <div>{renderOSInfo()}</div>
     }
   ]
 

@@ -6,14 +6,12 @@ import React, { useCallback, useState } from 'react'
 import { Tabs } from 'antd'
 import {
   CodeFilled,
-  RightSquareFilled,
-  RobotOutlined
+  RightSquareFilled
 } from '@ant-design/icons'
 import BookmarksList from '../sidebar/bookmark-select'
 import History from '../sidebar/history'
 import DragHandle from '../common/drag-handle'
 import QuickConnect from './quick-connect'
-import { isAIDisabled } from '../../common/ai-feature'
 
 const e = window.translate
 
@@ -28,7 +26,7 @@ export default function AddBtnMenu ({
   addPanelWidth,
   setAddPanelWidth
 }) {
-  const { onNewSsh, onNewSshAI } = window.store
+  const { onNewSsh } = window.store
   const [activeTab, setActiveTab] = useState('bookmarks')
   const cls = 'pd2x pd1y context-item pointer'
   const addTabBtn = window.store.hasNodePty
@@ -104,14 +102,6 @@ export default function AddBtnMenu ({
           <CodeFilled /> {e('newBookmark')}
         </div>
         {addTabBtn}
-        {!isAIDisabled() && (
-          <div
-            className={cls}
-            onClick={onNewSshAI}
-          >
-            <RobotOutlined /> {e('createBookmarkByAI')}
-          </div>
-        )}
         <QuickConnect batch={batch} inputOnly />
         <Tabs
           activeKey={activeTab}

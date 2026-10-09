@@ -17,23 +17,11 @@ const targetFilePath = resolve(
   '../../work/app/assets/index.html'
 )
 const pugContent = fs.readFileSync(entryPug, 'utf-8')
-const defaultAIPreset = {
-  baseURLAI: 'https://ai.electerm.org/api/ai',
-  apiPathAI: '/chat/completions',
-  modelAI: 'free',
-  authHeaderNameAI: 'Authorization: Bearer',
-  id: 'ai.electerm.org',
-  nameAI: 'ai.electerm.org',
-  siteUrl: 'https://ai.electerm.org?utm=electerm'
-}
-
-// const AIDisclamer = 'AI-generated terminal commands can be inaccurate or unsafe, be careful'
 
 const data = {
   version: pack.version,
-  siteName: pack.name,
-  isDev: false,
-  defaultAIPreset
+  siteName: pack.productName || pack.name,
+  isDev: false
 }
 const htmlContent = pug.render(pugContent, {
   filename: entryPug,

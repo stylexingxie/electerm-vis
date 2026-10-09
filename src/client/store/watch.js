@@ -4,14 +4,13 @@
 
 import createTitle from '../common/create-title'
 import { autoRun } from 'manate'
-import { update, remove, insert, dbNamesForWatch, dbNamesForSync } from '../common/db'
+import { update, remove, insert, dbNamesForWatch } from '../common/db'
 import {
   sftpDefaultSortSettingKey,
   checkedKeysLsKey,
   expandedKeysLsKey,
   resolutionsLsKey,
-  localAddrBookmarkLsKey,
-  syncServerDataKey
+  localAddrBookmarkLsKey
 } from '../common/constants'
 import * as ls from '../common/safe-local-storage'
 import { debounce, isEmpty } from 'lodash-es'
@@ -21,12 +20,6 @@ import dataCompare from '../common/data-compare'
 
 export default store => {
   for (const name of dbNamesForWatch) {
-    // ai chat history changes on every streaming tick (200ms polls,
-    // per-chunk agent updates); debounce to coalesce them into one
-    // db write after the stream pauses
-    const schedule = name === 'aiChatHistory'
-      ? func => debounce(func, 1000)
-      : undefined
     window[`watch${name}`] = autoRun(async () => {
       const n = store.getItems(name)
       if (window.migrating) {
@@ -69,27 +62,8 @@ export default store => {
         )
       }
       await store.updateLastDataUpdateTime()
-      if (dbNamesForSync.includes(name)) {
-        const syncSetting = store.config.syncSetting || {}
-        const { autoSync, autoSyncInterval, autoSyncDirection } = syncSetting
-        if (autoSync && autoSyncInterval === 0) {
-          if (autoSyncDirection === 'download') {
-            await store.downloadSettingAll()
-          } else {
-            await store.uploadSettingAll()
-          }
-        }
-      }
       return store[name]
-    }, schedule)
-    // Make the current store contents the watcher's baseline, so a later
-    // start() diffs against the store rather than a snapshot that no longer
-    // describes it. Needed after a rolled-back import: the store has just been
-    // restored to its pre-import state, and diffing that against the snapshot
-    // taken before the import would be read as "every record was removed".
-    window[`watch${name}`].reseed = () => {
-      refsStatic.add('oldState-' + name, deepCopy(store.getItems(name)) || [])
-    }
+    })
     window[`watch${name}`].start()
   }
 
@@ -142,11 +116,6 @@ export default store => {
   autoRun(() => {
     ls.setItemJSON(checkedKeysLsKey, store.checkedKeys)
     return store.checkedKeys
-  }).start()
-
-  autoRun(() => {
-    ls.setItemJSON(syncServerDataKey, store.syncServerStatus)
-    return store.syncServerStatus
   }).start()
 
   autoRun(() => {

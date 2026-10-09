@@ -5,10 +5,7 @@
 
 const fs = require('./fs')
 const log = require('../common/log')
-const { Upgrade } = require('./download-upgrade')
-const { transferKeys } = require('./transfer')
 const fetch = require('./fetch')
-const sync = require('./sync')
 const {
   createTerm,
   testTerm,
@@ -22,58 +19,27 @@ const {
 } = require('./terminal-api')
 const globalState = require('./global-state')
 const wsDec = require('./ws-dec')
+const { secureEqual } = require('../common/secure-compare')
 
 const { tokenElecterm } = process.env
 
 function verify (req) {
   const { token: to } = req.query
-  if (to !== tokenElecterm) {
+  // Constant-time compare: tokenElecterm is a per-startup random value, so the
+  // practical exposure is minimal, but a byte-wise early exit is free to avoid.
+  if (!secureEqual(to, tokenElecterm)) {
     throw new Error('not valid request')
   }
-  if (process.env.requireAuth === 'yes' && !globalState.authed) {
+  // process.env.requireAuth holds the hashed login password (see
+  // lib/child-process.js): when a password is configured, WS channels
+  // additionally require the /auth-verified state. An empty value means
+  // no password is configured and the token check above is enough.
+  if (process.env.requireAuth && !globalState.authed) {
     throw new Error('auth required')
   }
 }
 
 const initWs = function (app) {
-  // upgrade
-  app.ws('/upgrade/:id', (ws, req) => {
-    verify(req)
-    wsDec(ws)
-    const { id } = req.params
-    ws.on('close', () => {
-      const inst = globalState.getUpgradeInst(id)
-      if (inst) {
-        inst.destroy()
-      }
-    })
-    ws.on('message', async (message) => {
-      const msg = JSON.parse(message)
-      const { action } = msg
-
-      if (action === 'upgrade-new') {
-        const { id } = msg
-        const opts = Object.assign({}, msg, {
-          ws
-        })
-        const inst = new Upgrade(opts)
-        globalState.setUpgradeInst(id, inst)
-        await inst.init()
-      } else if (action === 'upgrade-func') {
-        const { id, func, args } = msg
-        const inst = globalState.getUpgradeInst(id)
-        if (!inst) {
-          return
-        }
-        if (!transferKeys.includes(func) || typeof inst[func] !== 'function') {
-          log.error('invalid upgrade function:', func)
-          return
-        }
-        inst[func](...args)
-      }
-    })
-  })
-
   // common functions
   app.ws('/common/s', (ws, req) => {
     verify(req)
@@ -84,8 +50,6 @@ const initWs = function (app) {
         const { action } = msg
         if (action === 'fetch') {
           fetch(ws, msg)
-        } else if (action === 'sync') {
-          sync(ws, msg)
         } else if (action === 'fs') {
           fs(ws, msg)
         } else if (action === 'create-terminal') {

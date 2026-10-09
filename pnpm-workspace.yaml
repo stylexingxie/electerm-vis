@@ -1,0 +1,19 @@
+# Single source of truth for which dependencies may run install/build scripts.
+# Modern pnpm (>=11) only reads auth/registry settings from .npmrc; every other
+# setting — including this one and `nodeLinker` — must live here (or in the
+# global config). Keeping a duplicate allowlist in package.json is therefore
+# both redundant and misleading.
+#
+# This list must stay COMPLETE: omitting a package that does have an install
+# script fails the entire install with ERR_PNPM_IGNORED_BUILDS (pnpm then
+# rewrites this file with a "set this to true or false" placeholder).
+#
+# `electron-winstaller` arrives transitively through
+# electron-builder-squirrel-windows. It lives under node_modules/.pnpm rather
+# than at the top level, so `ls node_modules/electron-winstaller` will not find
+# it — do not remove this entry based on that check.
+allowBuilds:
+  '@serialport/bindings-cpp': true
+  electron: true
+  electron-winstaller: true
+  node-pty: true

@@ -55,12 +55,7 @@ function generateErrorHtml (port) {
           <li>确认 VPN 或其他网络工具未重定向本地流量。</li>
           <li>检查防火墙规则或防病毒软件是否阻止了本地端口。</li>
         </ul>
-        <p>更改设置后重启应用程序。如果问题仍然存在，请联系作者：zxdong@gmail.com。</p>
-        <p>
-          <img
-            src='https://electerm.org/electerm-wechat-group-qr.jpg'
-          />
-        </p>
+        <p>更改设置后重启应用程序。</p>
       </div>
     </body>
     </html>

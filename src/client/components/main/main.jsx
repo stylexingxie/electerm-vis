@@ -3,7 +3,6 @@ import { lazy, Suspense, useEffect } from 'react'
 import Layout from '../layout/layout'
 import FileInfoModal from '../sftp/file-info-modal'
 import FileCompareModal from '../sftp/file-compare-modal'
-import UpdateCheck from './upgrade'
 import SettingModal from '../setting-panel/setting-modal'
 import TextEditor from '../text-editor/text-editor-entry'
 import Sidebar from '../sidebar'
@@ -26,7 +25,6 @@ import {
   remoteMonitorBarHeight,
   textTerminalBgValue
 } from '../../common/constants'
-import { isAIDisabled } from '../../common/ai-feature'
 import { ConfigProvider } from 'antd'
 import { NotificationContainer } from '../common/notification'
 import RightSidePanel from '../side-panel-r/side-panel-r'
@@ -35,12 +33,10 @@ import QuickCommandsFooterBox from '../quick-commands/quick-commands-box'
 import ConnectionHoppingWarning from './connection-hopping-warnning'
 import SshConfigLoadNotify from '../ssh-config/ssh-config-load-notify'
 import LoadSshConfigs from '../ssh-config/load-ssh-configs'
-import AIChat from '../ai/ai-chat-entry'
 import MoveItemModal from '../tree-list/move-item-modal'
 import InputContextMenu from '../common/input-context-menu'
 import WorkspaceSaveModal from '../tabs/workspace-save-modal'
 import BookmarkFromHistoryModal from '../bookmark-form/bookmark-from-history-modal'
-import AutoSync from '../setting-sync/auto-sync'
 import BatchOpRunner from '../batch-op/batch-op-runner'
 import UnixTimestampTooltip from '../terminal/unix-timestamp-tooltip'
 import ImportProgress from '../common/import-progress.jsx'
@@ -56,7 +52,6 @@ import './term-fullscreen.styl'
 
 const Resolutions = lazy(() => import('../rdp/resolution-edit'))
 const InfoModal = lazy(() => import('../sidebar/info-modal.jsx'))
-const AIConfigModal = lazy(() => import('../ai/ai-config-modal'))
 // window opacity is electron-only: lazy so the web app never loads the chunk
 const Opacity = lazy(() => import('../common/opacity'))
 
@@ -66,11 +61,9 @@ export default auto(function Index (props) {
     window.addEventListener('resize', store.onResize)
     setTimeout(store.triggerResize, 200)
     const { ipcOnEvent } = window.pre
-    ipcOnEvent('checkupdate', store.onCheckUpdate)
     ipcOnEvent('open-about', store.openAbout)
     ipcOnEvent('new-ssh', store.onNewSsh)
     ipcOnEvent('add-tab-from-command-line', store.addTabFromCommandLine)
-    ipcOnEvent('open-tab', (e, parsed) => store.ipcOpenTab(parsed))
     ipcOnEvent('openSettings', store.openSetting)
     ipcOnEvent('selectall', store.selectall)
     ipcOnEvent('focused', store.focus)
@@ -96,8 +89,6 @@ export default auto(function Index (props) {
     store.initData()
     store.checkForDbUpgrade()
     store.handleGetSerials()
-    store.checkPendingDeepLink()
-    store.checkPendingVvFile()
   }, [])
 
   // Track the actual input modality rather than a static capability probe:
@@ -143,7 +134,6 @@ export default auto(function Index (props) {
     rightPanelTab,
     widgetInstances
   } = store
-  const upgradeInfo = deepCopy(store.upgradeInfo)
   const remoteMonitorBarVisible = isRemoteMonitorBarVisible(store)
   const cls = classnames({
     loaded: configLoaded,
@@ -231,7 +221,6 @@ export default auto(function Index (props) {
       'height',
       'settingTab',
       'settingItem',
-      'isSyncingSetting',
       'leftSidePanelWidth',
       'leftSideBarWidth',
       'transferTab',
@@ -241,7 +230,6 @@ export default auto(function Index (props) {
     zoom: config.zoom,
     fileTransfers: copiedTransfer,
     transferHistory: copiedHistory,
-    upgradeInfo,
     pinned,
     isMobile: store.isMobile,
     leftSideBarIcons: config.leftSideBarIcons,
@@ -254,8 +242,7 @@ export default auto(function Index (props) {
       'showInfoModal',
       'commandLineHelp'
     ]),
-    installSrc,
-    upgradeInfo: store.upgradeInfo
+    installSrc
   }
   const conflictStoreProps = {
     fileTransferChanged: JSON.stringify(copiedTransfer),
@@ -284,20 +271,6 @@ export default auto(function Index (props) {
   const warningProps = {
     hasOldConnectionHoppingBookmark: store.hasOldConnectionHoppingBookmark,
     configLoaded
-  }
-  const aiChatProps = {
-    aiChatHistory: store.aiChatHistory,
-    config,
-    selectedTabIds: store.batchInputSelectedTabIds,
-    tabs: store.getTabs(),
-    activeTabId: store.activeTabId,
-    showAIConfig: store.showAIConfig,
-    rightPanelTab,
-    agentRunning: store.agentRunning,
-    aiContextInfo: store.aiContextInfo,
-    aiAutoCompress: store.aiAutoCompress,
-    currentChatSessionId: store.currentChatSessionId,
-    showChatSessions: store.showChatSessions
   }
   const cmdSuggestionsProps = {
     suggestions: store.terminalCommandSuggestions
@@ -333,11 +306,6 @@ export default auto(function Index (props) {
         {store.textEditorRequested && (
           <TextEditor />
         )}
-        <UpdateCheck
-          skipVersion={config.skipVersion}
-          upgradeInfo={upgradeInfo}
-          installSrc={installSrc}
-        />
         <FileInfoModal />
         <FileCompareModal />
         <SettingModal store={store} />
@@ -373,7 +341,6 @@ export default auto(function Index (props) {
           </LazyBoundary>
         )}
         <RightSidePanel {...rightPanelProps}>
-          {!isAIDisabled() && <AIChat {...aiChatProps} />}
           <TerminalInfo key={store.activeTabId} store={store} {...deepCopy(store.terminalInfoProps)} />
           {/* the cmd history panel has two homes; the footer popover is the
               other one, and both are the same component (see cmd-history.jsx) */}
@@ -390,20 +357,12 @@ export default auto(function Index (props) {
         <ConnectionHoppingWarning {...warningProps} />
         <TerminalCmdSuggestions {...cmdSuggestionsProps} />
         <TransferQueue />
-        <AutoSync config={config} />
         <WorkspaceSaveModal store={store} />
         <BookmarkFromHistoryModal />
         <NotificationContainer />
         <BatchOpRunner />
         <ImportProgress />
         <ShortcutBarEntry store={store} />
-        {!isAIDisabled() && store.showAIConfigModal && (
-          <LazyBoundary>
-            <Suspense fallback={null}>
-              <AIConfigModal store={store} />
-            </Suspense>
-          </LazyBoundary>
-        )}
         <UnixTimestampTooltip />
       </div>
     </ConfigProvider>

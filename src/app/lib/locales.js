@@ -2,7 +2,7 @@
  * multi language support
  */
 
-const { isDev, defaultLang } = require('../common/runtime-constants')
+const { defaultLang } = require('../common/runtime-constants')
 const { resolve } = require('path')
 
 function getOsLocale () {
@@ -13,11 +13,9 @@ function getOsLocale () {
 
 async function loadLocales () {
   const sysLocale = await getOsLocale() || defaultLang
-  const path = (isDev
-    ? '../../'
-    : '') +
-    '../node_modules/@electerm/electerm-locales/dist/cjs'
-  const localeFolder = resolve(__dirname, path)
+  // locales are vendored into the repo (src/app/vendor/electerm-locales) so the
+  // packaged app needs no extra dependency resolution for language packs
+  const localeFolder = resolve(__dirname, '../vendor/electerm-locales/dist/cjs')
   // languages array
   const langs = require(resolve(localeFolder, 'list.json'))
     .map(fileName => {
@@ -54,13 +52,14 @@ function findLang (langs, la) {
   return res
 }
 
-const getLang = (config, sysLocale, langs) => {
+const getLang = (config, langs) => {
   if (config.language) {
     return config.language
   }
-  let l = sysLocale
-  l = l ? l.toLowerCase().replace('-', '_') : defaultLang
-  return findLang(langs, l) || defaultLang
+  // internal build: Simplified Chinese is the default UI language,
+  // regardless of the OS locale (config.language, set in the settings
+  // panel, always wins)
+  return findLang(langs, 'zh_cn') || defaultLang
 }
 
 exports.getLang = getLang

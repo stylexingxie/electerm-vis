@@ -12,8 +12,6 @@ import encodes from '../bookmark-form/common/encodes'
 import { refs } from '../common/ref'
 import Qm from '../quick-commands/quick-commands-select'
 import TriggerSessionModal from '../triggers/trigger-session-modal'
-import AIIcon from '../icons/ai-icon'
-import { isAIDisabled } from '../../common/ai-feature'
 import CmdHistory from './cmd-history'
 
 const e = window.translate
@@ -108,24 +106,6 @@ export default auto(function FooterEntry (props) {
           />
         </Badge>
         <TriggerSessionModal store={store} />
-      </div>
-    )
-  }
-
-  function handleAIPanel () {
-    window.store.toggleAIPanel()
-  }
-
-  function renderAIIcon () {
-    const { rightPanelVisible, rightPanelTab } = props.store
-    // same contract as the info icon: lit while its panel is open
-    const active = rightPanelVisible && rightPanelTab === 'ai'
-    return (
-      <div className='terminal-footer-unit terminal-footer-ai'>
-        <AIIcon
-          onClick={handleAIPanel}
-          className={active ? 'active' : ''}
-        />
       </div>
     )
   }
@@ -271,7 +251,6 @@ export default auto(function FooterEntry (props) {
     <div {...sideProps}>
       <div className='terminal-footer-flex'>
         {showSidebarIcon}
-        {!isAIDisabled() && renderAIIcon()}
         {renderCmdHistory()}
         {renderQuickCommands()}
         {renderTriggers()}

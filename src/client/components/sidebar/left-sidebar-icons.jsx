@@ -10,7 +10,6 @@
 import {
   AppstoreOutlined,
   BookOutlined,
-  CloudSyncOutlined,
   PictureOutlined,
   PlusCircleOutlined,
   SettingOutlined,
@@ -30,15 +29,12 @@ export default function LeftSidebarIcons (props) {
     handleClickBookmark,
     onNewSsh,
     openSetting,
-    openSettingSync,
     openTerminalThemes,
     openWidgetsModal,
     bookmarksActive,
     themeActive,
     settingActive,
-    syncActive,
     widgetsActive,
-    isSyncingSetting,
     widgetInstancesLength
   } = props
 
@@ -106,19 +102,6 @@ export default function LeftSidebarIcons (props) {
         <SettingOutlined
           className='iblock font20 control-icon'
           onClick={openSetting}
-        />
-      </SideIcon>
-    ),
-    settingSync: (
-      <SideIcon
-        key='settingSync'
-        title={e('settingSync')}
-        active={syncActive}
-      >
-        <CloudSyncOutlined
-          className='iblock font20 control-icon'
-          onClick={openSettingSync}
-          spin={isSyncingSetting}
         />
       </SideIcon>
     ),

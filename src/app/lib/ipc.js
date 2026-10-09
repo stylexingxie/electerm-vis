@@ -42,13 +42,6 @@ const { saveUserConfig } = require('./user-config-controller')
 const { changeHotkeyReg, initShortCut } = require('./shortcut')
 const lastStateManager = require('./last-state')
 const {
-  registerDeepLink,
-  unregisterDeepLink,
-  checkProtocolRegistration,
-  getPendingDeepLink
-} = require('./deep-link')
-const { getPendingVvFile } = require('./vv-file-open')
-const {
   packInfo,
   appPath,
   isMac,
@@ -76,14 +69,6 @@ const {
 } = require('./install-command')
 const { watchFile, unwatchFile } = require('./watch-file')
 const lookup = require('../common/lookup')
-const {
-  AIchat,
-  AIchatWithTools,
-  AIlistModels,
-  getStreamContent,
-  stopStream,
-  abortAIRequest
-} = require('./ai')
 
 // Security: whitelist of safe environment variables for Linux/Mac/Windows
 const SAFE_ENV_KEYS = [
@@ -134,7 +119,7 @@ async function initAppServer () {
     langMap,
     sysLocale
   } = await loadLocales()
-  const language = getLang(config, sysLocale, langs)
+  const language = getLang(config, langs)
   config.language = language
   globalState.set('langMap', langMap)
   if (!globalState.get('serverInited')) {
@@ -244,12 +229,6 @@ function initIpc () {
       lastStateManager.set('windowSize', update)
     },
     saveUserConfig,
-    AIchat,
-    AIchatWithTools,
-    AIlistModels,
-    getStreamContent,
-    stopStream,
-    abortAIRequest,
     setTitle: (title) => {
       const win = globalState.get('win')
       win && win.setTitle(packInfo.name + ' - ' + title)
@@ -282,11 +261,6 @@ function initIpc () {
     runWidget,
     stopWidget,
     runWidgetFunc,
-    registerDeepLink,
-    unregisterDeepLink,
-    checkProtocolRegistration,
-    getPendingDeepLink,
-    getPendingVvFile,
     getEnv: (key) => {
       if (key) {
         return SAFE_ENV_KEYS.includes(key) ? process.env[key] : ''

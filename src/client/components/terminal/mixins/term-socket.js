@@ -150,7 +150,10 @@ export const socketMixin = {
       uid: id,
       srcTabId: tab.id,
       termType,
-      readyTimeout: config.sshReadyTimeout,
+      // floor at 5s: an SSH handshake (TCP + protocol negotiation) can
+      // never complete under ~1s, and a tiny misconfigured value here
+      // used to make every connection fail with a handshake timeout
+      readyTimeout: Math.max(Number(config.sshReadyTimeout) || 50000, 5000),
       proxy: getProxy(tab, config),
       type: tab.host
         ? typeMap.remote

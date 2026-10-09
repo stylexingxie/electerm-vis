@@ -10,7 +10,6 @@ import {
   maxZoom,
   minZoom
 } from '../common/constants'
-import { isAIDisabled } from '../common/ai-feature'
 
 const e = window.translate
 
@@ -62,19 +61,6 @@ export default Store => {
     store.openSettingModal()
     // on mobile, jump straight to the new bookmark form instead of the menu
     store.settingMobileView = 'content'
-  }
-
-  Store.prototype.onNewSshAI = function () {
-    const { store } = window
-    if (isAIDisabled()) {
-      return
-    }
-    if (store.aiConfigMissing()) {
-      store.toggleAIConfig()
-      return
-    }
-    window.et.openBookmarkWithAIMode = true
-    store.onNewSsh()
   }
 
   Store.prototype.confirmExit = function (type) {

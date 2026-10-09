@@ -1,19 +1,10 @@
 const { userConfigId } = require('../common/constants')
 const { dbAction } = require('./db')
 const getPort = require('./get-port')
-
-function hashPassword (password) {
-  const crypto = require('crypto')
-  const salt = crypto.randomBytes(16).toString('hex')
-  const hashedPassword = crypto.pbkdf2Sync(password, salt, 1000, 64, 'sha512').toString('hex')
-  return { salt, hashedPassword }
-}
-
-function comparePasswords (password, salt, hashedPassword) {
-  const crypto = require('crypto')
-  const hash = crypto.pbkdf2Sync(password, salt, 1000, 64, 'sha512').toString('hex')
-  return hash === hashedPassword
-}
+const {
+  hashPassword,
+  comparePasswords
+} = require('./password-hash')
 
 exports.setPassword = async function setPassword (password) {
   const q = {
@@ -25,18 +16,20 @@ exports.setPassword = async function setPassword (password) {
       ...q,
       ...userConfig,
       salt: '',
-      hashedPassword: ''
+      hashedPassword: '',
+      iterations: 0
     }, {
       upsert: true
     })
     return true
   }
-  const { salt, hashedPassword } = hashPassword(password)
+  const { salt, hashedPassword, iterations } = hashPassword(password)
   await dbAction('data', 'update', q, {
     ...q,
     ...userConfig,
     salt,
-    hashedPassword
+    hashedPassword,
+    iterations
   }, {
     upsert: true
   })
@@ -52,9 +45,21 @@ exports.checkPassword = async function checkPassword (password) {
   const q = {
     _id: userConfigId
   }
-  const { salt, hashedPassword } = await dbAction('data', 'findOne', q) || {}
-  const r = comparePasswords(password, salt, hashedPassword)
+  const {
+    salt,
+    hashedPassword,
+    iterations
+  } = await dbAction('data', 'findOne', q) || {}
+  const r = comparePasswords(password, salt, hashedPassword, iterations)
   if (r) {
+    // No transparent re-hash to DEFAULT_ITERATIONS here, deliberately: the
+    // server child process receives `hashedPassword` as `requireAuth` in its
+    // environment when it is spawned (server/child-process.js) and compares
+    // that snapshot against the token posted below. Rotating the stored digest
+    // mid-session would leave the snapshot stale and break the /auth handshake.
+    // Records written by older builds therefore keep verifying at
+    // LEGACY_ITERATIONS until the password is set again — at which point
+    // setPassword() re-hashes it with DEFAULT_ITERATIONS.
     const port = await getPort()
     await axios.post(`http://127.0.0.1:${port}/auth`, {
       token: hashedPassword

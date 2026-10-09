@@ -1,8 +1,9 @@
 const { resolve } = require('path')
-const { cp } = require('shelljs')
-const from = resolve(
+const { cp, mkdir } = require('shelljs')
+// brand assets (app logo / watermark / tray icon) live in the repo
+const brandFrom = resolve(
   __dirname,
-  '../../node_modules/@electerm/electerm-resource/tray-icons/*'
+  '../../src/client/assets/brand/*'
 )
 const from0 = resolve(
   __dirname,
@@ -18,7 +19,7 @@ const to2 = resolve(
 )
 const arr = [
   {
-    from,
+    from: brandFrom,
     to: to1,
     file: true
   }, {
@@ -26,6 +27,9 @@ const arr = [
     to: to2
   }
 ]
+
+mkdir('-p', to1)
+mkdir('-p', to2)
 
 for (const obj of arr) {
   const {

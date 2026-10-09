@@ -33,7 +33,6 @@ export default {
   keepaliveCountMax: 10,
   keyword2FA: 'verification code,otp,one-time,two-factor,2fa,totp,authenticator,duo,yubikey,security code,mfa,passcode',
   saveTerminalLogToFile: false,
-  checkUpdateOnStart: true,
   cursorBlink: false,
   cursorStyle: 'block',
   useSystemTitleBar: false,
@@ -77,12 +76,6 @@ export default {
   ],
   hideIP: false,
   dataSyncSelected: 'all',
-  nameAI: '',
-  baseURLAI: 'https://fluxionai.world/v1',
-  modelAI: 'deepseek-v4-flash-0731',
-  roleAI: '终端专家,提供不同系统下命令,简要解释用法,用markdown格式',
-  apiPathAI: '/chat/completions',
-  proxyAI: '',
   sessionLogPath: '',
   sshSftpSplitView: false,
   showCmdSuggestions: false,
@@ -105,7 +98,6 @@ export default {
     'bookmarks',
     'terminalThemes',
     'setting',
-    'settingSync',
     'widgets'
   ]
 }

@@ -2,7 +2,7 @@
  * Config-driven bookmark form (drop-in replacement)
  */
 import { PureComponent } from 'react'
-import { Radio, Button } from 'antd'
+import { Radio } from 'antd'
 import {
   settingMap,
   connectionMap,
@@ -17,12 +17,9 @@ import {
   terminalSpiceType
 } from '../../common/constants'
 import { createTitleWithTag } from '../../common/create-title'
-import { LoadingOutlined, BookOutlined, RobotOutlined } from '@ant-design/icons'
+import { LoadingOutlined, BookOutlined } from '@ant-design/icons'
 import sessionConfig from './config/session-config'
 import renderForm from './render-form'
-import AIBookmarkForm from './ai-bookmark-form'
-import CopyBookmark from './copy-bookmark'
-import { isAIDisabled } from '../../common/ai-feature'
 import './bookmark-form.styl'
 
 const e = window.translate
@@ -43,11 +40,9 @@ export default class BookmarkIndex2 extends PureComponent {
     ].includes(initType)) {
       initType = connectionMap.ssh
     }
-    const v = this.getInitAiModeState()
     this.state = {
-      ready: v,
-      bookmarkType: initType,
-      aiMode: v
+      ready: false,
+      bookmarkType: initType
     }
   }
 
@@ -62,52 +57,12 @@ export default class BookmarkIndex2 extends PureComponent {
     clearTimeout(this.timer1)
   }
 
-  getInitAiModeState () {
-    if (isAIDisabled()) {
-      return false
-    }
-    const v = window.et.openBookmarkWithAIMode
-    if (v !== true) {
-      return false
-    }
-    this.timer1 = setTimeout(() => {
-      delete window.et.openBookmarkWithAIMode
-    }, 1000)
-
-    return true
-  }
-
   handleChange = (e) => {
     this.setState({ bookmarkType: e.target.value })
   }
 
-  // the form instance lives in FormRenderer, the copy menu lives in the header
-  handleFormReady = (form) => {
-    this.form = form
-  }
-
-  // same shape the form submits: saved bookmark + what is currently typed
-  getFormValues = () => {
-    return {
-      ...this.props.formData,
-      ...(this.form ? this.form.getFieldsValue() : {})
-    }
-  }
-
-  handleCancelAiMode = () => {
-    this.setState({ aiMode: false })
-  }
-
-  handleToggleAIMode = () => {
-    if (window.store.aiConfigMissing()) {
-      window.store.toggleAIConfig()
-      return
-    }
-    this.setState(prev => ({ aiMode: !prev.aiMode }))
-  }
-
   renderTypes (bookmarkType, isNew, keys) {
-    if (!isNew || this.state.aiMode) return null
+    if (!isNew) return null
     const filtered = window.et && Array.isArray(window.et.supportSessionTypes)
       ? keys.filter(k => window.et.supportSessionTypes.includes(k))
       : keys
@@ -137,40 +92,8 @@ export default class BookmarkIndex2 extends PureComponent {
     )
   }
 
-  renderAIButton (isNew) {
-    if (!isNew || this.state.aiMode || isAIDisabled()) {
-      return null
-    }
-    return (
-      <Button
-        size='small'
-        className='mg1l create-ai-btn'
-        icon={<RobotOutlined />}
-        onClick={this.handleToggleAIMode}
-      >
-        {e('createBookmarkByAI')}
-      </Button>
-    )
-  }
-
-  renderAiForm () {
-    return (
-      <AIBookmarkForm
-        onCancel={this.handleCancelAiMode}
-      />
-    )
-  }
-
-  renderCopy () {
-    return <CopyBookmark getValues={this.getFormValues} />
-  }
-
   renderForm () {
-    const { bookmarkType, aiMode } = this.state
-    if (aiMode) {
-      return this.renderAiForm()
-    }
-    return renderForm(bookmarkType, this.props, this.handleFormReady)
+    return renderForm(this.state.bookmarkType, this.props)
   }
 
   render () {
@@ -197,8 +120,6 @@ export default class BookmarkIndex2 extends PureComponent {
               {((!isNew ? e('edit') : e('new')) + ' ' + e(settingMap.bookmarks))}
             </span>
             {this.renderTitle(formData, isNew)}
-            {this.renderAIButton(isNew)}
-            {this.renderCopy()}
           </p>
           {this.renderTypes(bookmarkType, isNew, keys)}
         </div>

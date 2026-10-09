@@ -3,7 +3,6 @@ import { Button, Input, Form, Flex } from 'antd'
 import {
   BgColorsOutlined,
   FontSizeOutlined,
-  RobotOutlined,
   SkinOutlined
 } from '@ant-design/icons'
 import message from '../common/message'
@@ -16,12 +15,10 @@ import {
 } from '../../common/terminal-theme'
 import { defaultThemeId, defaultThemeLightId } from '../../common/theme-defaults'
 import generate from '../../common/uid'
-import { isAIDisabled } from '../../common/ai-feature'
 import Link from '../common/external-link'
 import InputAutoFocus from '../common/input-auto-focus'
 import ResponsiveTabs from '../common/responsive-tabs'
 import ThemePicker from './theme-editor'
-import ThemeAiEditor from './theme-ai-editor'
 import Upload from '../common/upload'
 import './theme-form.styl'
 
@@ -181,15 +178,6 @@ export default function ThemeForm (props) {
     setTxt(tt)
   }
 
-  function handleAiGenerated (text) {
-    form.setFieldsValue({
-      themeText: text
-    })
-    setTxt(text)
-    // jump to the text editor so the user can review/adjust the result
-    setEditor('theme-editor-txt')
-  }
-
   function renderFuncs (id) {
     if (!id) {
       return null
@@ -297,13 +285,7 @@ export default function ThemeForm (props) {
     {
       key: 'theme-editor-txt',
       label: renderTabLabel(<FontSizeOutlined className='mg1r' />, e('editWithTextEditor'))
-    },
-    ...(!isAIDisabled()
-      ? [{
-          key: 'theme-editor-ai',
-          label: renderTabLabel(<RobotOutlined className='mg1r' />, 'AI')
-        }]
-      : [])
+    }
   ]
   const tabsProps = {
     activeKey: editor,
@@ -366,18 +348,11 @@ export default function ThemeForm (props) {
         {
           editor === 'theme-editor-txt'
             ? renderTxt()
-            : editor === 'theme-editor-ai'
-              ? (
-                <ThemeAiEditor
-                  onChange={handleAiGenerated}
-                  disabled={disabled}
-                />
-                )
-              : (
-                <ThemePicker
-                  {...pickerProps}
-                />
-                )
+            : (
+              <ThemePicker
+                {...pickerProps}
+              />
+              )
         }
       </FormItem>
       {

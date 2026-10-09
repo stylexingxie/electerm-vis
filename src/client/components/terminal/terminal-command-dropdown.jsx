@@ -1,20 +1,12 @@
 import { Component } from 'manate/react/class-components'
 import { refsStatic, refs } from '../common/ref'
 import SuggestionItem from './cmd-item'
-import { aiSuggestionsCache } from '../../common/cache'
-import { appendMandatoryGuardrails } from '../ai/ai-guardrails'
-import { isAIDisabled } from '../../common/ai-feature'
 import classnames from 'classnames'
-import {
-  LoadingOutlined
-} from '@ant-design/icons'
 
 export default class TerminalCmdSuggestions extends Component {
   state = {
     cursorPosition: {},
     showSuggestions: false,
-    loadingAiSuggestions: false,
-    aiSuggestions: [],
     cmdIsDescription: false,
     reverse: false,
     cmd: '',
@@ -27,76 +19,6 @@ export default class TerminalCmdSuggestions extends Component {
 
   componentWillUnmount () {
     refsStatic.remove('terminal-suggestions')
-  }
-
-  parseAiSuggestions = (aiResponse) => {
-    try {
-      return JSON.parse(aiResponse.response).map(d => {
-        return {
-          command: d,
-          type: 'AI'
-        }
-      })
-    } catch (e) {
-      console.log('parseAiSuggestions error:', e)
-      return []
-    }
-  }
-
-  getAiSuggestions = async (event) => {
-    event.stopPropagation()
-    const { cmd } = this.state
-    if (window.store.aiConfigMissing()) {
-      window.store.toggleAIConfig()
-    }
-    this.setState({
-      loadingAiSuggestions: true
-    })
-    const {
-      config
-    } = window.store
-    const prompt = `give me max 5 command suggestions for user input: "${cmd}", return pure json format result only, no extra words, no markdown format, follow this format: ["command1","command2"...]`
-    const cached = aiSuggestionsCache.get(cmd)
-    if (cached) {
-      this.setState({
-        loadingAiSuggestions: false,
-        aiSuggestions: cached
-      })
-      return
-    }
-
-    const aiResponse = aiSuggestionsCache.get(prompt) || await window.pre.runGlobalAsync(
-      'AIchat',
-      prompt,
-      config.modelAI,
-      appendMandatoryGuardrails(config.roleAI),
-      config.baseURLAI,
-      config.apiPathAI,
-      config.apiKeyAI,
-      config.proxyAI,
-      false,
-      config.authHeaderNameAI
-    ).catch(
-      window.store.onError
-    )
-    if (cmd !== this.state.cmd) {
-      this.setState({
-        loadingAiSuggestions: false
-      })
-      return
-    }
-    if (aiResponse && aiResponse.error) {
-      this.setState({
-        loadingAiSuggestions: false
-      })
-      return window.store.onError(
-        new Error(aiResponse.error)
-      )
-    }
-    this.setState({
-      loadingAiSuggestions: false,
-      aiSuggestions: this.parseAiSuggestions(aiResponse, cmd)
-    })
   }
 
   openSuggestions = (cursorPosition, cmd) => {
@@ -182,19 +104,9 @@ export default class TerminalCmdSuggestions extends Component {
   closeSuggestions = () => {
     document.removeEventListener('click', this.handleClickOutside)
     document.removeEventListener('keydown', this.handleKeyDown)
-    const {
-      aiSuggestions
-    } = this.state
-    if (aiSuggestions.length) {
-      aiSuggestionsCache.set(this.state.cmd, aiSuggestions)
-      aiSuggestions.forEach(item => {
-        window.store.addCmdHistory(item.command, 'aiCmdHistory')
-      })
-    }
     this._suggestionsCache = null
     this.setState({
       showSuggestions: false,
-      aiSuggestions: [],
       passwordMode: false
     })
   }
@@ -296,10 +208,10 @@ export default class TerminalCmdSuggestions extends Component {
   _suggestionsCacheKey = ''
 
   getSuggestions = () => {
-    // Memoize: only recompute when cmd, reverse, aiSuggestions, or props change
-    const { cmd, reverse, aiSuggestions } = this.state
+    // Memoize: only recompute when cmd, reverse or props change
+    const { cmd, reverse } = this.state
     const { suggestions } = this.props
-    const cacheKey = cmd + '|' + reverse + '|' + (aiSuggestions?.length || 0) + '|' + (suggestions?.history?.length || 0) + '|' + (suggestions?.batch?.length || 0) + '|' + (suggestions?.quick?.length || 0)
+    const cacheKey = cmd + '|' + reverse + '|' + (suggestions?.history?.length || 0) + '|' + (suggestions?.batch?.length || 0) + '|' + (suggestions?.quick?.length || 0)
     if (this._suggestionsCache && this._suggestionsCacheKey === cacheKey) {
       return this._suggestionsCache
     }
@@ -310,16 +222,6 @@ export default class TerminalCmdSuggestions extends Component {
       quick = []
     } = suggestions || {}
     const res = []
-    aiSuggestions
-      .forEach(item => {
-        if (!uniqueCommands.has(item.command)) {
-          uniqueCommands.add(item.command)
-        }
-        res.push({
-          id: 'AI:' + item.command,
-          ...item
-        })
-      })
     this.processCommands(history, 'H', uniqueCommands, res)
     this.processCommands(batch, 'B', uniqueCommands, res)
     this.processCommands(quick, 'Q', uniqueCommands, res)
@@ -327,49 +229,6 @@ export default class TerminalCmdSuggestions extends Component {
     this._suggestionsCache = finalRes
     this._suggestionsCacheKey = cacheKey
     return finalRes
-  }
-
-  renderAIIcon () {
-    const e = window.translate
-    const {
-      loadingAiSuggestions
-    } = this.state
-    if (loadingAiSuggestions) {
-      return (
-        <>
-          <LoadingOutlined /> {e('getAiSuggestions')}
-        </>
-      )
-    }
-    const aiProps = {
-      onClick: this.getAiSuggestions,
-      className: 'pointer'
-    }
-    return (
-      <div {...aiProps}>
-        {e('getAiSuggestions')}
-      </div>
-    )
-  }
-
-  renderSticky (pos) {
-    const {
-      reverse
-    } = this.state
-    if (isAIDisabled()) {
-      return null
-    }
-    if (
-      (pos === 'top' && !reverse) ||
-      (pos === 'bottom' && reverse)
-    ) {
-      return null
-    }
-    return (
-      <div className='terminal-suggestions-sticky'>
-        {this.renderAIIcon()}
-      </div>
-    )
   }
 
   render () {
@@ -385,7 +244,6 @@ export default class TerminalCmdSuggestions extends Component {
     })
     return (
       <div className={cls} style={cursorPosition}>
-        {!passwordMode && this.renderSticky('top')}
         <div className='terminal-suggestions-list'>
           {
             suggestions.map(item => {
@@ -400,7 +258,6 @@ export default class TerminalCmdSuggestions extends Component {
             })
           }
         </div>
-        {!passwordMode && this.renderSticky('bottom')}
       </div>
     )
   }

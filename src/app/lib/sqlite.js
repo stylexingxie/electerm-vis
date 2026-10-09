@@ -8,9 +8,10 @@ const { resolve } = require('path')
 const fs = require('fs')
 const uid = require('../common/uid')
 const { DatabaseSync } = require('node:sqlite')
+const { dataFolderName } = require('../common/runtime-constants')
 
 // Tables whose stored data values should be encrypted at rest
-const ENC_TABLES = new Set(['bookmarks', 'profiles', 'data', 'history', 'terminalCommandHistory', 'aiChatHistory'])
+const ENC_TABLES = new Set(['bookmarks', 'profiles', 'data', 'history', 'terminalCommandHistory'])
 
 // Within the 'data' table, only this specific record is encrypted
 const DATA_ENC_ID = 'userConfig'
@@ -19,7 +20,7 @@ const DATA_ENC_ID = 'userConfig'
 const ENC_PREFIX = 'enc:'
 
 function createDb (appPath, defaultUserName, { enc, dec } = {}) {
-  const appDataPath = process.env.DATA_PATH || resolve(appPath, 'electerm')
+  const appDataPath = process.env.DATA_PATH || resolve(appPath, dataFolderName)
 
   if (!fs.existsSync(appDataPath)) {
     fs.mkdirSync(appDataPath, { recursive: true })
@@ -27,8 +28,8 @@ function createDb (appPath, defaultUserName, { enc, dec } = {}) {
 
   // Define database folder and paths for two database files
   const dbFolder = resolve(appDataPath, 'users', defaultUserName)
-  const mainDbPath = resolve(dbFolder, 'electerm.db')
-  const dataDbPath = resolve(dbFolder, 'electerm_data.db')
+  const mainDbPath = resolve(dbFolder, `${dataFolderName}.db`)
+  const dataDbPath = resolve(dbFolder, `${dataFolderName}_data.db`)
 
   // Ensure parent directory exists
   if (!fs.existsSync(dbFolder)) {
@@ -53,7 +54,6 @@ function createDb (appPath, defaultUserName, { enc, dec } = {}) {
     'triggers',
     'history',
     'terminalCommandHistory',
-    'aiChatHistory',
     'autoRunWidgets'
   ]
 

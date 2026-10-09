@@ -7,7 +7,6 @@ import {
   isMac,
   isWin
 } from '../../common/constants'
-import Link from '../common/external-link'
 import { copy } from '../../common/clipboard'
 import compare from '../../common/version-compare'
 
@@ -83,7 +82,7 @@ export default class ErrorBoundary extends React.PureComponent {
     return (
       <div className='pd1y wordbreak'>
         <h2>{e('troubleShoot')}</h2>
-        <p>Electerm Version: {packInfo.version}, OS: {os}</p>
+        <p>Version: {packInfo.version}, OS: {os}</p>
         {
           Object.keys(troubleshootContent).map((k, i) => {
             const v = troubleshootContent[k]
@@ -102,29 +101,13 @@ export default class ErrorBoundary extends React.PureComponent {
   }
 
   renderContacts () {
-    const {
-      bugs: {
-        url: bugReportLink
-      }
-    } = packInfo
-    const bugUrl = `${bugReportLink}/new/choose`
+    // Internal build: no upstream support routing, and — importantly — no
+    // remote assets. This block used to render an <img> pointing at
+    // electerm.org, which made every error screen issue an outbound request.
     return (
-      <>
-        <div className='pd1b'>
-          <Link to={bugUrl}>{e('bugReport')}</Link>
-        </div>
-        <div className='pd1b'>
-          <span>Contact author: </span>
-          <Link to='mailto:zxdong@gmail.com'>zxdong@gmail.com</Link>
-        </div>
-        <div className='pd3y'>
-          <img
-            src='https://electerm.org/electerm-wechat-group-qr.jpg'
-            className='mwm-100'
-            width={200}
-          />
-        </div>
-      </>
+      <div className='pd1b'>
+        <span>本工具基于 electerm 构建，问题请反馈至内部团队。</span>
+      </div>
     )
   }
 

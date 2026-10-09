@@ -2,7 +2,6 @@ const { rm, echo } = require('shelljs')
 const {
   run,
   writeSrc,
-  uploadToR2,
   builder,
   patchNsisKeepShortcuts
 } = require('./build-common')
@@ -18,7 +17,6 @@ async function main () {
   rm('-rf', 'dist')
   writeSrc(src)
   await run(`${pb} --win nsis`)
-  await uploadToR2(src)
 }
 
 main()

@@ -1,283 +1,152 @@
-<h1 align="center" style="padding-top: 60px;padding-bottom: 40px;">
-    <a href="https://electerm.org">
-        <img src="https://github.com/electerm/electerm-resource/raw/master/static/images/electerm.png", alt="" />
-    </a>
-</h1>
+# vis远程工具 (VISYSTEM internal build)
 
-[![GitHub version](https://badgers.space/github/release/electerm/electerm?corner_radius=m)](https://github.com/electerm/electerm/releases)
-[![license](https://img.shields.io/badge/license-MIT-blue.svg)](https://github.com/electerm/electerm/blob/master/LICENSE)
-[![GitHub Sponsors](https://img.shields.io/github/sponsors/electerm?label=Sponsors)](https://github.com/sponsors/electerm)
-[![star](https://atomgit.com/electerm/electerm/star/badge.svg)](https://atomgit.com/electerm/electerm)
+Windows-only, internally trimmed build of **electerm**, maintained by VISYSTEM.
 
-[English](README.md) | [中文](build/docs/README_cn.md) | [日本語](build/docs/README_jp.md)
+| | |
+| --- | --- |
+| Brand | VISYSTEM |
+| Product name | vis远程工具 |
+| Package name | `vis-remote-tool` |
+| Internal version | `5.5.6-vis-rc3` (decoupled from upstream) |
+| Upstream base | electerm 5.5.6 |
+| Target platform | Windows x64 (NSIS installer) |
+| Package manager | pnpm >= 11 |
 
-Open-sourced terminal/ssh/sftp/telnet/serialport/RDP/VNC/Spice/ftp client(Linux, Mac, Windows, Android, HarmonyOS, iOS).
+This tool is built on electerm. See `LICENSE` for the original MIT license and
+copyright, and https://github.com/electerm/electerm for the upstream project.
 
-Besides mainstream Windows/macOS/Linux/Android, electerm also supports HarmonyOS, iOS, and older systems — Ubuntu 18, Windows 7, macOS 10+, and special Chinese Linux distributions such as UOS, Kylin, and LoongArch (both old-world and new-world), as well as RISC-V (riscv64) and PowerPC 64-bit little-endian (ppc64le) Linux.
+## What this build is
 
-<p>
-  <a href="https://electerm.org">Homepage / Downloads</a> ·
-  <a href="https://theme.electerm.org">Theme</a> ·
-  <a href="https://github.com/electerm/electerm-web-docker">Docker</a> ·
-  <a href="https://demo.electerm.org">Online demo</a> ·
-  <a href="https://github.com/electerm/electerm-android">Android</a> ·
-  <a href="https://github.com/electerm/electerm-harmony">HarmonyOS</a> ·
-  <a href="https://apps.apple.com/cn/app/electerm/id6792971552">Apple App Store</a> ·
-  <a href="https://appgallery.huawei.com/app/detail?id=org.electerm.electerm">Huawei AppGallery</a> ·
-  <a href="https://www.microsoft.com/store/apps/9NCN7272GTFF">Microsoft Store</a> ·
-  <a href="https://snapcraft.io/electerm">Snap Store</a> ·
-  <a href="https://repos.electerm.org/deb">deb repo</a> ·
-  <a href="https://repos.electerm.org/rpm">rpm repo</a>
-</p>
+A feature-narrowed fork for internal use. The following upstream capabilities
+have been **removed** from the source tree:
 
-<div>🌐 <strong><a href="https://cloud.electerm.org">electerm online</a></strong> — Public free online electerm app</div>
-<div>🤖 <strong><a href="https://ai.electerm.org">electerm AI</a></strong> — Free AI for electerm users</div>
-<div>💻 <strong><a href="https://github.com/electerm/electerm-web">electerm-web</a></strong> — Web app version running in browser (including mobile device)</div>
+- **Data sync** — GitHub / Gitee gist, WebDAV, custom server and electerm cloud
+  sync (server routes, client store, settings UI, the `electerm-sync` dependency).
+- **Application self-upgrade** — update check, download, install and the
+  "check for update" UI, plus the `download-upgrade` WebSocket channel.
+- **AI features** — AI chat panel, AI bookmark creation, AI theme editor,
+  AI command suggestions, AI model configuration.
+- **MCP server** — the MCP widget, the MCP server implementation and the
+  MCP request handler in the renderer.
+- **Deep links / URL scheme registration** — the ssh/telnet/rdp/vnc/serial/spice
+  and `electerm://` protocol handlers are no longer registered with the OS.
+- **Custom module downloader** — the runtime npm package downloader used by
+  `customRequire` (an external network path).
+- **macOS / Linux / non-NSIS packaging** — all platform build scripts, signing
+  entitlements, AppImage/Snap/deb/rpm targets, AppX and the npm CLI
+  distribution channel.
 
-## Sponsors
+Everything else is upstream electerm: SSH/SFTP/FTP/Telnet/Serial/RDP/VNC/Spice
+sessions, the terminal, file transfer, bookmarks, profiles, quick commands,
+triggers, themes, widgets, workspaces and remote monitoring.
 
-<div align="center">
-  <a href="https://www.atlascloud.ai/?ref=PCAEL2&utm_source=github&utm_medium=link&utm_campaign=electerm">
-    <img src="https://github.com/electerm/electerm-resource/blob/master/static/images/atlas-cloud.png?raw=true" alt="Atlas Cloud" width="260" />
-  </a>
-</div>
+## Requirements
 
-[Atlas Cloud](https://www.atlascloud.ai/?ref=PCAEL2&utm_source=github&utm_medium=link&utm_campaign=electerm) provides OpenAI-compatible AI APIs and model access for AI-powered workflows in electerm.
+- Node.js `^20.19.0 || >=22.12.0` (the range vite 8 declares)
+- pnpm >= 11
+- Windows x64 for producing the installer
 
-----
-
-<div align="center">
-  <a href="https://www.packyapi.ai/register?aff=DOZI">
-    <img src="https://github.com/electerm/electerm-resource/blob/master/static/images/packy-api.png?raw=true" alt="PackyCode" width="210" />
-  </a>
-</div>
-
-[PackyCode](https://www.packyapi.ai/register?aff=DOZI) — Access leading AI models through PackyCode with one API endpoint and one API key. Enjoy fast, reliable access with automatic failover and dedicated high-speed routes for Codex and Claude Code. Get started with $1 in free credits, a discount on your first top-up, and savings of up to 80% on eligible routes. Pay in RMB with no currency conversion markups or extra top-up fees.
-
-----
-
-<div align="center">
-  <a href="https://fluxionai.space/register?source=github&campaign=github-sidrune-electerm&promo=SDRELECTERM&aff=7H7DERHU3GFF">
-    <img src="https://github.com/electerm/electerm-resource/blob/master/static/images/sidrune.png?raw=true" alt="Sidrune" width="210" />
-  </a>
-</div>
-
-[Sidrune AI](https://fluxionai.space/register?source=github&campaign=github-sidrune-electerm&promo=SDRELECTERM&aff=7H7DERHU3GFF) — One gateway to the world's leading AI models, one unified API with multi-route delivery; transparent usage and pricing, Claude & OpenAI — 70% OFF [Register through the partner link
-Get $3 in API credit](https://fluxionai.space/register?source=github&campaign=github-sidrune-electerm&promo=SDRELECTERM&aff=7H7DERHU3GFF).
-
-----
-
-<div align="center">
-  <br />
-  <br />
-  <a href="https://go.apimart.ai/gh-electerm">
-    <img src="https://github.com/electerm/electerm-resource/blob/master/static/images/apimart.jpg?raw=true" alt="ApiMart" width="200" />
-  </a>
-  <br />
-  <br />
-</div>
-
-Thanks to APIMart for sponsoring electerm! APIMart is a low-cost API platform for AI image & video generation — GPT-Image-2 from $0.006/image, 160+ images per dollar. One async API covers both image and video: submit a task, get an ID, fetch results via polling or callback. Batch tens of thousands of images without timeouts, switch models without changing code. Pay-as-you-go with no monthly fee — [sign up here to get started](https://go.apimart.ai/gh-electerm).
-
-----
-
-<div align="center">
-  <a href="https://www.apismart.ai">
-    <img src="https://github.com/electerm/electerm-resource/blob/master/static/images/apismart400x400.png?raw=true" alt="ApiSmart" width="200" />
-  </a>
-</div>
-
-[ApiSmart](https://www.apismart.ai) provides unified access to leading AI models through a single API. Use one API key to connect with LLM, image, and video models through an OpenAI-compatible interface, without managing multiple providers separately. Switch models easily, simplify billing, and improve reliability with intelligent routing and automatic failover. Build and scale AI applications faster with one streamlined API platform.
-
-----
-
-<div align="center">
-
-<a href="https://www.digitalocean.com/?refcode=c10bcb28b846&utm_campaign=Referral_Invite&utm_medium=Referral_Program&utm_source=badge"><img align="middle" src="https://web-platforms.sfo2.cdn.digitaloceanspaces.com/WWW/Badge%202.svg" alt="DigitalOcean Referral Badge" /></a>&nbsp;&nbsp;&nbsp;<a href="https://oss-directory.vercel.app"><img align="middle" src="https://github.com/electerm/electerm-resource/blob/master/static/images/vercel-oss-2005.png?raw=true" alt="Vercel OSS Program" /></a>
-
-</div>
-
-<div align="center">
-    <img src="https://github.com/electerm/electerm-resource/raw/master/static/images/electerm-banner-1.jpg", alt="" />
-</div>
-
-## Features
-
-- Works as a terminal/file manager, ssh/sftp/ftp/telnet/serialport/RDP/VNC/Spice client
-- Support Window 7+(X64/ARM64), HarmonyOS，Android, iOS, Mac OS 10.15+(x64/arm64), Linux(x64/arm64/riscv64/ppc64le/Loong64 new world & old world), even old Linux with glibc 2.17+ like UOS/Kylin/Ubuntu 18.04 etc
-- Global hotkey to toggle window visibility (similar to guake, default is `ctrl + 2`)
-- 🇺🇸 🇨🇳 🇧🇷 🇷🇺 🇪🇸 🇫🇷 🇹🇷 🇭🇰 🇯🇵 🇸🇦 🇩🇪 🇰🇷 🇮🇩 🇵🇱 Multi-language support([electerm-locales](https://github.com/electerm/electerm-locales), contributions/fixes welcome)
-- Double click to directly edit (small) remote files.
-- All kind of auth methods: publicKey, password, ssh agent, certificates, otp, netbird etc.
-- Support Zmodem(rz, sz), and [Trzsz](https://github.com/trzsz/trzsz)(trz/tsz).
-- Support ssh related features: tunnel, connection hopping.
-- Customizable UI: themes, background image, transparent window(Mac, win).
-- Global/session proxy.
-- Quick commands/triggers to do predefined tasks and automattic operations
-- Sync data including bookmarks to github/gitee secret gist/webdav/custom server/electerm cloud
-- Quick input/mirror input to one or all terminals.
-- AI assistant integration (supporting multiple LLM API formats — OpenAI Chat Completions, OpenAI Responses, and Anthropic Messages) to help with command suggestions, script writing, and explaining selected terminal content, create bookmarks/themes, and agent mode to directly do terminal operations
-- MCP (Model Context Protocol) widget for AI assistants and external tools integration - see [MCP Widget Usage Guide](https://github.com/electerm/electerm/wiki/MCP-Widget-Usage-Guide)
-- Deep link support: Open connections with URLs like `telnet://192.168.2.31:34554` or `ssh://user@host:22` - see [Deep link support wiki](https://github.com/electerm/electerm/wiki/Deep-link-support)
-- Command line usage: check [wiki](https://github.com/electerm/electerm/wiki/Command-line-usage)
-
-## Install
-
-- For Mac user: `brew install --cask electerm`
-- With snap: `sudo snap install electerm --classic`
-- For some Linux distribution, you can find it from OS default App store(Ubuntu, Deepin, Mint...).
-- For some linux OS, the `rpm`, `deb`, or `snap` release may not work, you can try the `tar.gz` or `.appImage` release.
-- For Windows users, you can install it from [windows store](https://www.microsoft.com/store/apps/9NCN7272GTFF), command-line installer [winget](https://github.com/microsoft/winget-cli) and [scoop](https://github.com/lukesampson/scoop) is also recommended:
-
-```powershell
-# winget https://github.com/microsoft/winget-cli
-winget install electerm.electerm
-
-# scoop https://github.com/lukesampson/scoop
-scoop bucket add dorado https://github.com/chawyehsu/dorado
-scoop install dorado/electerm
-```
-
-- Install from Debian repository (for Debian/Ubuntu-based systems) with `apt` command
-
-Check [https://repos.electerm.org/deb](https://repos.electerm.org/deb)
-
-- Install from npm
+## Install dependencies
 
 ```bash
-npm i -g electerm
-
+pnpm install
 ```
 
-## Upgrade
+Native modules (`node-pty`, `@serialport/bindings-cpp`) are built through the
+`allowBuilds` allowlist in `pnpm-workspace.yaml` — that file is the single source
+of truth. Since pnpm 11 an `.npmrc` is only read for auth/registry settings, so
+build-script and `nodeLinker` settings must not be put there.
 
-- Auto upgrade: When a new version is released, you will get an upgrade notification after you start electerm again. You can then click the upgrade button to upgrade.
-- Download: Just download the latest edition, reinstall.
-- Npm: If you install from npm, just run `npm i -g electerm` again.
-- If use Snap or some other distribution system, these systems may provide upgrades.
-
-## Known issues
-
-[https://github.com/electerm/electerm/wiki/Know-issues](https://github.com/electerm/electerm/wiki/Know-issues)
-
-## Troubleshoot
-
-[https://github.com/electerm/electerm/wiki/Troubleshoot](https://github.com/electerm/electerm/wiki/Troubleshoot)
-
-## Discussion
-
-[![Discord](https://img.shields.io/badge/Discord-Join-blue?logo=discord)](https://discord.gg/855W7g8EVd)
-
-[Discussion board](https://github.com/electerm/electerm/discussions)
-
-![electerm-wechat-group-qr.jpg](https://electerm.org/electerm-wechat-group-qr.jpg)
-
-## Support
-
-Would love to hear from you, please tell me what you think, [submit an issue](https://github.com/electerm/electerm/issues), [Start a new discussion](https://github.com/electerm/electerm/discussions/new), [create/fix language files](https://github.com/electerm/electerm-locales) or create pull requests, all welcome.
-
-## Sponsor this project
-
-github sponsor
-
-[https://github.com/sponsors/electerm](https://github.com/sponsors/electerm)
-
-kofi
-
-[https://ko-fi.com/zhaoxudong](https://ko-fi.com/zhaoxudong)
-
-wechat donate
-
-[![wechat donate](https://electerm.org/electerm-wechat-donate.png)](https://github.com/electerm)
-
-TRON TRN20
-
-[![TRN20 donate](https://github.com/electerm/electerm-resource/blob/master/static/images/trn20.png?raw=true)]
-
-Address: TXk3pQNmQu1vihH76RaEFnK9wg13x4LLCZ
-
-## Dev
+## Build the client bundle
 
 ```bash
-# May only works in Linux
-# needs nodejs/npm, suggest using nvm to install nodejs/npm
-# with nodejs 24.x
-
-git clone git@github.com:electerm/electerm.git
-cd electerm
-npm config set legacy-peer-deps true
-npm i
-
-# start vite dev server, requires port 5570
-npm start
-
-# in a separate terminal session run app
-npm run app
-
-# code format check
-npm run lint
-
-# code format fix
-npm run fix
+pnpm run build          # vite bundle -> work/app/assets
+pnpm run b              # clean + bundle + copy assets + render index.html
 ```
 
-## Test
+## Run locally
 
 ```bash
-npm run b
-npm run prepare-test
-cp ./build/.sample.env ./.env
-
-# edit .env, fill your test host/username/password, may only works in mac OS
-npm run test
+pnpm run start          # dev server + electron
+# or, after a full `pnpm run b`:
+pnpm run t              # electron work/app/app.js
 ```
 
-## Test build
+## Package the Windows installer
 
 ```bash
-# May only works in Linux
-# Install yarn first(to do yarn autoclean)
-# See https://yarnpkg.com/en/docs/install
-
-# Build linux only with -l
-npm i
-npm run b
-npm run pb
-./node_modules/.bin/electron-builder --linux tar.gz
-# or replace tar.gz to rpm/deb/AppImage
-# check dist/ folder
-
-# build for linux arm/
-./node_modules/.bin/electron-builder --linux --arm64
+pnpm run b              # prepare work/app (production deps + assets)
+pnpm run pb             # copy build/electron-builder.json to the project root
+pnpm run build-win      # electron-builder --win nsis -> dist/, then verify-package
 ```
 
-## Video guide
+The installer is written to `dist/` as
+`vis远程工具-win-x64-installer.exe`. The version and `rc` suffix deliberately do
+**not** appear in the artifact name; the version lives in `package.json` only.
 
-- [https://electerm.org/videos](https://electerm.org/videos)
+`pnpm run build-win` ends with `verify-package`, which fails the build when the
+packaged app violates any of these invariants:
 
-## Change log
+- native binaries for any platform other than `win32-x64`
+- the arm64 conpty copy under `node-pty/third_party`
+- `node-pty/lib/unixTerminal.js` (Unix-only terminal implementation)
+- third-party sourcemaps (`*.map`) inside `app.asar`
 
-Visit [Releases](https://github.com/electerm/electerm/releases).
+It also reports Authenticode signing status. Because a package built before a
+source change is just as wrong as a mis-trimmed one, re-run the full chain
+(`pnpm run b && pnpm run pb && pnpm run build-win`) after touching anything under
+`src/app`, `src/client` or `src/server`.
 
-## Contact author
+## Code signing
 
-[zxdong@gmail.com](mailto:zxdong@gmail.com)
+The installer is **not signed** unless a certificate is supplied, so Windows
+SmartScreen will warn on first run. To sign, provide the certificate through
+electron-builder's standard environment variables and re-run the packaging step:
 
+```bash
+CSC_LINK=/path/to/cert.pfx CSC_KEY_PASSWORD=<password> pnpm run build-win
+```
+
+`CSC_LINK` accepts a local `.pfx` path, a `file://` URL, or a base64-encoded
+certificate. SHA-256 is used for the signature and the timestamp is taken from
+`http://timestamp.digicert.com` (both configured in `build/electron-builder.json`).
+
+`verify-package` fails the build when `CSC_LINK`/`CSC_KEY_PASSWORD` are set but
+the produced installer is not validly signed, so a misconfigured certificate
+cannot slip through silently. An intentionally unsigned build still succeeds and
+just prints a warning.
+
+## Uninstall and user data
+
+Uninstalling **keeps** the user's data — `deleteAppDataOnUninstall` is explicitly
+`false` in `build/electron-builder.json`. Bookmarks, sessions, profiles and
+settings live in `%APPDATA%\vis-remote-tool` and survive both uninstall and
+reinstall, which is the intended behaviour for a tool that stores connection
+profiles.
+
+To remove everything by hand, uninstall the application and then delete:
+
+```
+%APPDATA%\vis-remote-tool
+```
+
+Note that this directory is separate from upstream electerm's
+`%APPDATA%\electerm`, which this build never reads or writes.
+
+## Tests
+
+```bash
+pnpm run test-unit-ci       # node --test src/test/unit-ci/*.spec.js
+pnpm run test-integration   # node --test src/test/integration/*.spec.js
+pnpm run test               # playwright e2e (see src/test/e2e)
+```
+
+`@playwright/test` is a normal devDependency. The e2e suite additionally needs a
+local SSH target (see `src/test/integration/lib/ssh-test-server.js`) configured
+via `.env`, and must run with `ELECTRON_RUN_AS_NODE`/`NODE_OPTIONS` unset and
+`DISABLE_GPU=1` on machines without a usable GPU.
 
 ## License
 
-MIT
-
-## Star History
-
-<p>
- <a href="https://www.star-history.com/electerm/electerm"><img src="https://api.star-history.com/badge?repo=electerm/electerm" alt="Star History Rank" /></a>
-</p>
-
-<a href="https://www.star-history.com/?repos=electerm%2Felecterm&type=date&legend=top-left">
- <picture>
-   <source media="(prefers-color-scheme: dark)" srcset="https://api.star-history.com/chart?repos=electerm/electerm&type=date&legend=top-left&sealed_token=DvPlttPaLtq6RPIWRANYX08-8ZJyrJalhombrkDcg1IwWOMPMIplgi85q0FiwrbhE3lRIi_yxvOWdell731CGQvzlfJMt2Sa6VfCvQ80BwEtQ6RpPchEiw" />
-   <source media="(prefers-color-scheme: light)" srcset="https://api.star-history.com/chart?repos=electerm/electerm&type=date&legend=top-left&sealed_token=DvPlttPaLtq6RPIWRANYX08-8ZJyrJalhombrkDcg1IwWOMPMIplgi85q0FiwrbhE3lRIi_yxvOWdell731CGQvzlfJMt2Sa6VfCvQ80BwEtQ6RpPchEiw" />
-   <img alt="Star History Chart" src="https://api.star-history.com/chart?repos=electerm/electerm&type=date&legend=top-left&sealed_token=DvPlttPaLtq6RPIWRANYX08-8ZJyrJalhombrkDcg1IwWOMPMIplgi85q0FiwrbhE3lRIi_yxvOWdell731CGQvzlfJMt2Sa6VfCvQ80BwEtQ6RpPchEiw" />
- </picture>
-</a>
+MIT — see [LICENSE](./LICENSE). The original copyright (c) ZHAO Xudong and the
+electerm contributors is retained in full.

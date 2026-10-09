@@ -14,7 +14,6 @@ export const leftSidebarIconOptions = [
   { id: 'bookmarks', text: 'bookmarks' },
   { id: 'terminalThemes', text: 'terminalThemes' },
   { id: 'setting', text: 'setting' },
-  { id: 'settingSync', text: 'settingSync' },
   { id: 'widgets', text: 'widgets' }
 ]
 

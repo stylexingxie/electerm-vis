@@ -6,7 +6,6 @@ import { PureComponent } from 'react'
 import {
   Popover
 } from 'antd'
-import logoSvg from '@electerm/electerm-resource/res/imgs/electerm.svg?raw'
 import { shortcutDescExtend } from '../shortcuts/shortcut-handler.js'
 import MenuRender from './sys-menu.jsx'
 import { refsStatic } from '../common/ref.js'
@@ -48,10 +47,6 @@ class MenuBtn extends PureComponent {
 
   reload = () => {
     window.location.reload()
-  }
-
-  onCheckUpdate = () => {
-    window.store.onCheckUpdate()
   }
 
   restart = () => {
@@ -162,15 +157,6 @@ class MenuBtn extends PureComponent {
       //   type: 'hr'
       // },
       {
-        key: 'onCheckUpdate',
-        func: 'onCheckUpdate',
-        icon: 'UpCircleOutlined',
-        text: e('checkForUpdate')
-      },
-      // {
-      //   type: 'hr'
-      // },
-      {
         key: 'restart',
         func: 'restart',
         icon: 'RedoOutlined',
@@ -230,10 +216,7 @@ class MenuBtn extends PureComponent {
         <div
           {...pops}
         >
-          <span
-            className='menu-logo'
-            dangerouslySetInnerHTML={{ __html: logoSvg }}
-          />
+          <span className='menu-logo-text'>VIS</span>
         </div>
       </Popover>
     )
